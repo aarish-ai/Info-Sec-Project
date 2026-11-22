@@ -1,56 +1,91 @@
 {% extends "base.html" %}
 
-{% block title %}Verify Media Integrity · Public Portal{% endblock %}
+{% block title %}Public Integrity Inspection Gate · MediaGuard{% endblock %}
 
 {% block content %}
 <div class="container-narrow">
-  <div class="card-glass">
-    <div class="card-header">
-      <div class="badge-status badge-info">Public Verification Portal</div>
-      <h1 class="card-title">Verify Media Authenticity</h1>
-      <p class="card-subtitle">
-        Universal provenance and integrity inspection portal. Verify any digital media asset against
-        its tamper-evident registration manifest, cryptographic hashes (SHA-256 and pHash), and RSA-PSS digital signature.
+  <div class="inspection-gate-card">
+    <!-- Header Aperture -->
+    <div class="card-header mb-lg">
+      <div class="flex-row items-center gap-xs mb-xs">
+        <span class="badge-status badge-info font-mono">Public Verification Portal</span>
+        <span class="hud-status-indicator">
+          <span class="hud-led-dot pulse-emerald" aria-hidden="true"></span>
+          <span class="hud-led-label font-mono text-xs">[GATE_READY]</span>
+        </span>
+      </div>
+      <h1 class="card-title text-2xl font-display">PUBLIC INTEGRITY INSPECTION GATE</h1>
+      <p class="card-subtitle text-sm text-muted">
+        Universal cryptographic provenance portal. Authenticate any media asset against its registered manifest, bit-level SHA-256 digest, 64-bit DCT perceptual hash, and RSA-PSS digital signature.
       </p>
     </div>
 
     <form action="/verify" method="POST" enctype="multipart/form-data" class="flex-col gap-lg">
+      <!-- Ingress Vector 1: Certificate UUID Aperture -->
       <div class="form-group">
-        <label for="cert_id" class="form-label">Certificate / Media ID (UUID)</label>
-        <input 
-          type="text" 
-          id="cert_id" 
-          name="cert_id" 
-          class="input-terminal font-mono" 
-          placeholder="e.g. 4b8d7a12-8e1e-458b-9a41-2c938f4d9201"
-          value="{{ cert_id or '' }}" 
-          required
-        >
-        <span class="form-hint">Tip: If you scanned a QR code, the Certificate ID is automatically prefilled.</span>
-      </div>
-
-      <div class="form-group">
-        <label for="verify-file" class="form-label">Upload File to Verify</label>
-        <div class="dropzone" id="verify-dropzone">
-          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <path d="M9 15l2 2 4-4"/>
-          </svg>
-          <div class="dropzone-title">Drop your file here or click to browse</div>
-          <div class="dropzone-desc">Upload the file you wish to authenticate against this certificate.</div>
-          <input type="file" id="verify-file" name="file" class="input-terminal" required accept=".jpg,.jpeg,.png,.mp4,.mov">
+        <label for="certificate_id" class="form-label font-mono text-xs text-muted flex-row justify-between">
+          <span>// INGRESS VECTOR 01: CERTIFICATE UUID</span>
+          <span class="text-dim">[REQUIRED]</span>
+        </label>
+        
+        <div class="aperture-input-group">
+          <span class="aperture-prompt" aria-hidden="true">❯</span>
+          <input 
+            type="text" 
+            id="certificate_id" 
+            name="cert_id" 
+            class="input-terminal input-aperture font-mono" 
+            placeholder="e.g. 4b8d7a12-8e1e-458b-9a41-2c938f4d9201"
+            value="{{ cert_id or '' }}" 
+            required
+            autocomplete="off"
+            spellcheck="false"
+            data-name="certificate_id"
+          >
+          <input type="hidden" name="certificate_id" value="{{ cert_id or '' }}">
         </div>
+        <span class="form-hint font-mono text-xs text-dim">Scanned QR codes or asset permalinks populate this aperture automatically.</span>
       </div>
 
-      <div class="flex-row justify-between items-center">
-        <a href="/" class="btn btn-outline">Cancel</a>
-        <button type="submit" class="btn btn-primary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Ingress Vector 2: Evidence Ingestion Plate with Laser Corner Brackets -->
+      <div class="form-group">
+        <label for="verify-file" class="form-label font-mono text-xs text-muted flex-row justify-between">
+          <span>// INGRESS VECTOR 02: EVIDENCE SPECIMEN</span>
+          <span class="text-dim">[ACCEPTED: JPG, PNG, MP4, MOV]</span>
+        </label>
+        
+        <div class="evidence-plate-container">
+          <!-- Laser Corner Brackets -->
+          <div class="evidence-bracket bracket-tl" aria-hidden="true"></div>
+          <div class="evidence-bracket bracket-tr" aria-hidden="true"></div>
+          <div class="evidence-bracket bracket-bl" aria-hidden="true"></div>
+          <div class="evidence-bracket bracket-br" aria-hidden="true"></div>
+
+          <!-- Dropzone Plate -->
+          <div class="dropzone evidence-plate" id="verify-dropzone">
+            <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M9 15l2 2 4-4"/>
+            </svg>
+            <div class="dropzone-title font-mono text-sm">[DROP SPECIMEN FILE OR CLICK TO MOUNT]</div>
+            <div class="dropzone-desc font-mono text-xs text-muted">Mount local asset specimen to inspect against registered provenance manifest</div>
+            <div class="file-feedback font-mono text-xs mt-xs"></div>
+            <input type="file" id="verify-file" name="file" class="input-terminal" required accept=".jpg,.jpeg,.png,.mp4,.mov" data-name="media_file">
+          </div>
+        </div>
+        <span class="form-hint font-mono text-xs text-dim">Zero-Plaintext Policy: Asset is streamed in RAM; no plaintext writes persist to server storage.</span>
+      </div>
+
+      <!-- Inspection Gate Actions -->
+      <div class="flex-row justify-between items-center mt-md">
+        <a href="/" class="btn btn-basalt font-mono">[ABORT / RETURN]</a>
+        <button type="submit" class="btn btn-primary btn-lava font-mono">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          Run Integrity Check
+          [EXECUTE INTEGRITY INSPECTION]
         </button>
       </div>
     </form>
