@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Trail · Cryptographic Hash Chain{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="flex-row justify-between items-center mb-lg flex-wrap gap-md">
+    <div>
+      <h1 class="card-title">Cryptographic Audit Trail</h1>
+      <p class="card-subtitle">
+        Tamper-evident, blockchain-style hash-chained log linking every security event with SHA-256 integrity proofs.
+      </p>
+    </div>
+    <div class="flex-row gap-sm items-center">
+      <form action="/audit/verify-chain" method="POST" id="verify-chain-form">
+        <button type="submit" class="btn btn-primary" id="btn-verify-chain">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+          Verify Entire Audit Chain
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Real-time Verification Badge Container (populated via AJAX or server flash) -->
+  <div id="chain-status-banner" class="mb-lg"></div>
+
+  <!-- Search and Filter Bar -->
+  <div class="card-glass mb-lg">
+    <form action="/audit" method="GET" class="flex-row gap-sm items-center flex-wrap">
+      <div class="flex-1">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ query or '' }}" 
+          placeholder="Filter by action, details, user, IP, or hash..." 
+          class="input-terminal"
+        >
+      </div>
+      <button type="submit" class="btn btn-secondary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Filter Logs
+      </button>
+      {% if query %}
+        <a href="/audit" class="btn btn-outline">Clear</a>
+      {% endif %}
+      <span class="text-muted text-sm ml-auto">
+        Showing <strong>{{ logs|length }}</strong> of <strong>{{ total }}</strong> recorded entries
+      </span>
+    </form>
+  </div>
+
+  {% if logs %}
+    <div class="table-container card-glass">
+      <table class="table-vault">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Timestamp (UTC)</th>
+            <th>Actor</th>
+            <th>Security Action</th>
+            <th>Event Details</th>
+            <th>Client IP</th>
+            <th>Cryptographic Current Hash</th>
+            <th>Previous Hash Linkage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+            <tr>
+              <td>
+                <span class="badge-status badge-info">#{{ log.log_id }}</span>
+              </td>
+              <td class="font-mono text-sm">{{ log.timestamp }}</td>
+              <td>
+                {% if log.username %}
+                  <div class="flex-col">
+                    <strong>{{ log.username }}</strong>
+                    <span class="text-dim text-xs">{{ log.user_role or 'User' }}</span>
+                  </div>
+                {% else %}
+                  <span class="text-muted">System / Anonymous</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-status badge-role">{{ log.action }}</span>
+              </td>
+              <td>
+                <span class="text-main">{{ log.details or '—' }}</span>
+              </td>
+              <td class="font-mono text-xs">{{ log.ip_address or '—' }}</td>
+              <td>
+                <code class="hash-badge" title="{{ log.current_hash }}">
+                  {{ log.current_hash[:10] }}...{{ log.current_hash[-8:] }}
+                </code>
+              </td>
+              <td>
+                {% if log.prev_hash == '0000000000000000000000000000000000000000000000000000000000000000' %}
+                  <span class="badge-status badge-authentic">Genesis Block</span>
+                {% else %}
+                  <code class="hash-badge" title="{{ log.prev_hash }}">
+                    {{ log.prev_hash[:10] }}...{{ log.prev_hash[-8:] }}
+                  </code>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card-glass text-center py-2xl">
+      <h3 class="text-muted">No Audit Log Entries Found</h3>
+      <p class="text-dim text-sm mt-xs">
+        {% if query %}
+          No entries match your search query "{{ query }}". Try resetting filters.
+        {% else %}
+          The tamper-evident audit log is currently empty.
+        {% endif %}
+      </p>
+      {% if query %}
+        <div class="mt-md">
+          <a href="/audit" class="btn btn-secondary btn-sm">Reset Filter</a>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const verifyForm = document.getElementById('verify-chain-form');
+    const verifyBtn = document.getElementById('btn-verify-chain');
+    const statusBanner = document.getElementById('chain-status-banner');
+
+    if (verifyForm && verifyBtn && statusBanner) {
+      verifyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        verifyBtn.disabled = true;
+        const originalText = verifyBtn.innerHTML;
+        verifyBtn.innerHTML = 'Verifying Hash Chain...';
+
+        try {
+          const res = await fetch('/audit/verify-chain', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          const data = await res.json();
+
+          if (data.valid) {
+            statusBanner.innerHTML = `
+              <div class="alert alert-success">
+                <div class="alert-content">
+                  <span class="badge-status badge-authentic">CRYPTOGRAPHICALLY VALID</span>
+                  <span>${data.message}</span>
+                </div>
+              </div>
+            `;
+          } else {
+            statusBanner.innerHTML = `
+              <div class="alert alert-danger">
+                <div class="alert-content">
+                  <span class="badge-status badge-modified">CHAIN INTEGRITY BREACH</span>
+                  <span>${data.message}</span>
+                </div>
+              </div>
+            `;
+          }
+        } catch (err) {
+          statusBanner.innerHTML = `
+            <div class="alert alert-danger">
+              <div class="alert-content">
+                <span>Failed to complete chain verification request.</span>
+              </div>
+            </div>
+          `;
+        } finally {
+          verifyBtn.disabled = false;
+          verifyBtn.innerHTML = originalText;
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MediaGuard{% endblock %} · Provenance & Integrity</title>
+  
+  <!-- MediaGuard Design Tokens & Component Stylesheets -->
+  <link rel="stylesheet" href="/static/css/variables.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Global Navigation Bar -->
+  <header class="nav-bar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <span>MediaGuard</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/verify" class="nav-link">Verify File</a></li>
+
+          {% if session.get('user_id') %}
+            <li><a href="/media" class="nav-link">My Media</a></li>
+            <li><a href="/media/upload" class="nav-link">Upload</a></li>
+
+            {% if session.get('role') in ['Auditor', 'Admin'] %}
+              <li><a href="/audit" class="nav-link">Audit Logs</a></li>
+            {% endif %}
+
+            {% if session.get('role') == 'Admin' %}
+              <li><a href="/admin" class="nav-link">Admin Panel</a></li>
+            {% endif %}
+
+            <li><a href="/experiments" class="nav-link">Experiments</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+
+      <div class="nav-user">
+        {% if session.get('user_id') %}
+          <div class="flex-row items-center gap-xs">
+            <span class="nav-user-label">User: <strong>{{ session.get('username') }}</strong></span>
+            <span class="badge-status badge-role">{{ session.get('role') }}</span>
+          </div>
+          <a href="/auth/logout" class="btn btn-secondary btn-sm">Logout</a>
+        {% else %}
+          <a href="/auth/login" class="btn btn-outline btn-sm">Login</a>
+          <a href="/auth/register" class="btn btn-primary btn-sm">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Notification Toast Container -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container">
+        <div class="alert-container">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else category }}">
+              <div class="alert-content">
+                <span>{{ message }}</span>
+              </div>
+              <button type="button" class="alert-close" aria-label="Close alert">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content Shell -->
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-meta">
+        <strong>MediaGuard</strong> · Cryptographic Provenance & Dual-Check Media Integrity System
+      </div>
+      <div>
+        CS-353 Information Security · NUST SEECS
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="/static/js/main.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

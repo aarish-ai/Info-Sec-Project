@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}My Media Vault{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="flex-row justify-between items-center mb-lg">
+    <div>
+      <h1 class="card-title">Encrypted Media Vault</h1>
+      <p class="card-subtitle">Manage your cryptographically registered assets, download provenance certificates, or retrieve decrypted originals.</p>
+    </div>
+    <a href="/media/upload" class="btn btn-primary">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Upload New Media
+    </a>
+  </div>
+
+  {% if media_list %}
+    <div class="table-container card-glass">
+      <table class="table-vault">
+        <thead>
+          <tr>
+            <th>Asset Filename</th>
+            <th>MIME Type</th>
+            <th>File Size</th>
+            <th>Cryptographic Fingerprint (SHA-256)</th>
+            <th>Perceptual Hash</th>
+            <th>Registration Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in media_list %}
+            <tr>
+              <td>
+                <strong>{{ item.original_filename }}</strong>
+              </td>
+              <td>
+                <span class="badge-status badge-info">{{ item.file_type }}</span>
+              </td>
+              <td>{{ "{:,}".format(item.file_size) }} B</td>
+              <td>
+                <code class="hash-badge" title="{{ item.sha256_hash }}">
+                  {{ item.sha256_hash[:12] }}...{{ item.sha256_hash[-8:] }}
+                </code>
+              </td>
+              <td>
+                <code class="hash-badge">{{ item.phash }}</code>
+              </td>
+              <td>{{ item.registration_timestamp }}</td>
+              <td>
+                <div class="flex-row gap-xs items-center">
+                  {% if item.file_type in ['image/jpeg', 'image/png'] %}
+                    <a href="/media/{{ item.media_id }}/preview" class="btn btn-secondary btn-sm" title="View Decrypted Preview">Preview</a>
+                  {% endif %}
+                  <a href="/media/{{ item.media_id }}/download" class="btn btn-outline btn-sm" title="Decrypt & Download Original">Download</a>
+                  <a href="/media/{{ item.media_id }}/certificate" class="btn btn-primary btn-sm" title="Download Official PDF Certificate">Certificate</a>
+                  <a href="/verify?cert_id={{ item.media_id }}" class="btn btn-secondary btn-sm" title="Verify in Public Portal">Verify</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card-glass text-center">
+      <div class="badge-status badge-info mb-sm">Vault Empty</div>
+      <h2>No Registered Media Found</h2>
+      <p>You have not encrypted or registered any media assets yet. Click below to secure your first file.</p>
+      <div class="mt-md">
+        <a href="/media/upload" class="btn btn-primary">Upload First Asset</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

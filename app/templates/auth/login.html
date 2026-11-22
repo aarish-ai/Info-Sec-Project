@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <div class="card-glass">
+    
+    <!-- Tab Switcher -->
+    <div class="auth-tabs">
+      <a href="/auth/login" class="auth-tab active">Sign In</a>
+      <a href="/auth/register" class="auth-tab">Create Account</a>
+    </div>
+
+    <!-- Lockout Warning Banner (if attempts > 0 or locked) -->
+    {% if is_locked %}
+      <div class="lockout-banner">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div>
+          <strong>Account Locked:</strong> Maximum failed login attempts exceeded. Contact an administrator to unlock your credentials.
+        </div>
+      </div>
+    {% elif failed_attempts and failed_attempts > 0 %}
+      <div class="alert alert-warning">
+        <div class="alert-content">
+          <span>Security Alert: {{ failed_attempts }} failed login attempt(s). Account will be locked after 5 failed attempts.</span>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card-header text-center">
+      <h2>MediaGuard Vault Access</h2>
+      <p class="text-muted">Enter your credentials and 6-digit TOTP authenticator code.</p>
+    </div>
+
+    <form method="POST" action="/auth/login" class="card-body">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          class="input-terminal" 
+          placeholder="e.g. security_auditor" 
+          value="{{ username or '' }}"
+          required 
+          autocomplete="username"
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="input-terminal" 
+          placeholder="••••••••••••" 
+          required 
+          autocomplete="current-password"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="totp_code" class="form-label">
+          <span>TOTP Authenticator Code</span>
+          <span class="badge-status badge-info">2FA Required</span>
+        </label>
+        <input 
+          type="text" 
+          id="totp_code" 
+          name="totp_code" 
+          class="input-terminal font-mono text-center" 
+          placeholder="000000" 
+          maxlength="6" 
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          autocomplete="one-time-code"
+        >
+        <span class="form-hint">Open Google Authenticator, Authy, or 1Password for your current 6-digit code.</span>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Authenticate & Unlock Vault
+        </button>
+      </div>
+    </form>
+
+    <div class="card-footer text-center">
+      <span class="text-dim">Protected by Argon2id key derivation & RFC 6238 time-step authentication.</span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

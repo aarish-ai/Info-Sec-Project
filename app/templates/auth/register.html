@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <div class="card-glass">
+    
+    <!-- Tab Switcher -->
+    <div class="auth-tabs">
+      <a href="/auth/login" class="auth-tab">Sign In</a>
+      <a href="/auth/register" class="auth-tab active">Create Account</a>
+    </div>
+
+    <div class="card-header text-center">
+      <h2>MediaGuard Registration</h2>
+      <p class="text-muted">Enroll to receive dedicated cryptographic key pairs for provenance verification.</p>
+    </div>
+
+    <!-- Explanatory Security Card -->
+    <div class="feature-card">
+      <div class="flex-row items-center gap-xs">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span class="badge-status badge-info">Zero-Plaintext Security</span>
+      </div>
+      <p class="feature-desc">
+        Upon submission, MediaGuard automatically generates independent 2048-bit RSA-PSS (signing) and RSA-OAEP (encryption) key pairs. Your private keys will be encrypted at rest using AES-256-GCM and an scrypt-derived KEK before storage.
+      </p>
+    </div>
+
+    <form method="POST" action="/auth/register" class="card-body">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          class="input-terminal" 
+          placeholder="e.g. alice_investigator" 
+          value="{{ username or '' }}"
+          required 
+          autocomplete="username"
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="input-terminal" 
+          placeholder="alice@agency.gov" 
+          value="{{ email or '' }}"
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="role" class="form-label">Account Role</label>
+        <select id="role" name="role" class="input-terminal form-select">
+          <option value="User" {% if role == 'User' or not role %}selected{% endif %}>User (Media Producer & Verifier)</option>
+          <option value="Auditor" {% if role == 'Auditor' %}selected{% endif %}>Auditor (Compliance & Ledger Inspector)</option>
+          <option value="Admin" {% if role == 'Admin' %}selected{% endif %}>Admin (Full Governance & Security Controls)</option>
+        </select>
+        <span class="form-hint">Roles govern granular access to audit chains and administrative controls.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Master Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="input-terminal" 
+          placeholder="Minimum 12 characters recommended" 
+          required 
+          autocomplete="new-password"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="confirm_password" class="form-label">Confirm Master Password</label>
+        <input 
+          type="password" 
+          id="confirm_password" 
+          name="confirm_password" 
+          class="input-terminal" 
+          placeholder="Re-enter master password" 
+          required 
+          autocomplete="new-password"
+        >
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+          Generate Keys & Register
+        </button>
+      </div>
+    </form>
+
+    <div class="card-footer text-center">
+      <span class="text-dim">Already have an account? <a href="/auth/login">Sign in here</a></span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

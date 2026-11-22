@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Media Integrity · Public Portal{% endblock %}
+
+{% block content %}
+<div class="container-narrow">
+  <div class="card-glass">
+    <div class="card-header">
+      <div class="badge-status badge-info">Public Verification Portal</div>
+      <h1 class="card-title">Verify Media Authenticity</h1>
+      <p class="card-subtitle">
+        Universal provenance and integrity inspection portal. Verify any digital media asset against
+        its tamper-evident registration manifest, cryptographic hashes (SHA-256 and pHash), and RSA-PSS digital signature.
+      </p>
+    </div>
+
+    <form action="/verify" method="POST" enctype="multipart/form-data" class="flex-col gap-lg">
+      <div class="form-group">
+        <label for="cert_id" class="form-label">Certificate / Media ID (UUID)</label>
+        <input 
+          type="text" 
+          id="cert_id" 
+          name="cert_id" 
+          class="input-terminal font-mono" 
+          placeholder="e.g. 4b8d7a12-8e1e-458b-9a41-2c938f4d9201"
+          value="{{ cert_id or '' }}" 
+          required
+        >
+        <span class="form-hint">Tip: If you scanned a QR code, the Certificate ID is automatically prefilled.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="verify-file" class="form-label">Upload File to Verify</label>
+        <div class="dropzone" id="verify-dropzone">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <path d="M9 15l2 2 4-4"/>
+          </svg>
+          <div class="dropzone-title">Drop your file here or click to browse</div>
+          <div class="dropzone-desc">Upload the file you wish to authenticate against this certificate.</div>
+          <input type="file" id="verify-file" name="file" class="input-terminal" required accept=".jpg,.jpeg,.png,.mp4,.mov">
+        </div>
+      </div>
+
+      <div class="flex-row justify-between items-center">
+        <a href="/" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Run Integrity Check
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

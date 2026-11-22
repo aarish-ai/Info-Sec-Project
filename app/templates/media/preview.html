@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Decrypted Asset Preview · {{ media.original_filename }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="flex-row justify-between items-center mb-lg">
+    <div>
+      <div class="badge-status badge-authentic mb-xs">Authenticated & Decrypted</div>
+      <h1 class="card-title">{{ media.original_filename }}</h1>
+      <p class="card-subtitle">In-memory decrypted preview. The original ciphertext remains protected on disk via AES-256-GCM.</p>
+    </div>
+    <div class="flex-row gap-xs">
+      <a href="/media/{{ media.media_id }}/download" class="btn btn-outline">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download Decrypted File
+      </a>
+      <a href="/media/{{ media.media_id }}/certificate" class="btn btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        PDF Certificate
+      </a>
+    </div>
+  </div>
+
+  <div class="grid-2 gap-lg items-start">
+    <div class="preview-container card-glass">
+      <div class="preview-media-wrapper">
+        <img src="{{ image_data_uri }}" alt="Decrypted preview of {{ media.original_filename }}" class="preview-img">
+      </div>
+    </div>
+
+    <div class="card-glass flex-col gap-md">
+      <h3 class="card-title">Cryptographic Provenance</h3>
+      
+      <div class="form-group">
+        <label class="form-label">Media / Certificate ID</label>
+        <div class="input-terminal font-mono">{{ media.media_id }}</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">SHA-256 Digest</label>
+        <div class="input-terminal font-mono">{{ media.sha256_hash }}</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Perceptual Hash (pHash)</label>
+        <div class="input-terminal font-mono">{{ media.phash }}</div>
+      </div>
+
+      <div class="grid-2 gap-sm">
+        <div class="form-group">
+          <label class="form-label">MIME Content Type</label>
+          <div class="input-terminal">{{ media.file_type }}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registered Size</label>
+          <div class="input-terminal">{{ "{:,}".format(media.file_size) }} bytes</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Registration Timestamp</label>
+        <div class="input-terminal">{{ media.registration_timestamp }}</div>
+      </div>
+
+      <div class="mt-sm">
+        <a href="/verify?cert_id={{ media.media_id }}" class="btn btn-secondary">
+          Open in Public Verification Portal &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}SECURE_MODE Switch · OWASP Demonstration{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">OWASP Top 10 Security Architecture Matrix</h1>
+    <p class="page-subtitle">
+      Academic viva demonstration controller allowing live comparison of vulnerable execution paths vs. active cryptographic defenses.
+    </p>
+  </div>
+
+  <!-- Master Interactive Toggle Card -->
+  <div class="card-glass mb-xl">
+    <div class="flex-row justify-between items-center flex-wrap gap-md">
+      <div>
+        <div class="flex-row items-center gap-xs mb-xs">
+          <span class="text-dim text-xs">GLOBAL SYSTEM CONTROLLER</span>
+          {% if secure_mode %}
+            <span class="badge-status badge-authentic">SECURE_MODE: ON (ACTIVE DEFENSES)</span>
+          {% else %}
+            <span class="badge-status badge-modified">SECURE_MODE: OFF (VULNERABLE VIVA MODE)</span>
+          {% endif %}
+        </div>
+        <h2 class="card-title text-2xl mb-xs">
+          Current State: 
+          {% if secure_mode %}
+            <span class="text-success">Hardened Defense Profile</span>
+          {% else %}
+            <span class="text-danger">Exposed Demonstration Profile</span>
+          {% endif %}
+        </h2>
+        <p class="card-desc text-sm text-muted">
+          {% if secure_mode %}
+            All 8 OWASP Top 10 safeguards are actively enforced: strict IDOR authorization, parameterized queries, AES-256-GCM envelope encryption, and safe error handling.
+          {% else %}
+            Defenses are intentionally deactivated to showcase vulnerability mechanics for evaluation: IDOR ownership bypass is exposed, raw SQL formatting enabled, and tracebacks unsuppressed.
+          {% endif %}
+        </p>
+      </div>
+
+      <div>
+        <form action="/admin/secure-mode/toggle" method="POST">
+          <button type="submit" class="btn {{ 'btn-danger' if secure_mode else 'btn-primary' }} btn-lg">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+              <line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+            Toggle SECURE_MODE ({{ 'Deactivate Defenses' if secure_mode else 'Activate Defenses' }})
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparative OWASP Top 10 Breakdown Table -->
+  <div class="table-container card-glass">
+    <table class="table-vault">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Vulnerable Behavior (SECURE_MODE = False)</th>
+          <th>Active Defense Countermeasure (SECURE_MODE = True)</th>
+          <th>Target Component</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in defenses %}
+          <tr>
+            <td>
+              <div class="flex-col">
+                <span class="badge-status badge-info mb-xs">{{ item.id }}</span>
+                <strong>{{ item.category.split('–')[1] if '–' in item.category else item.category }}</strong>
+              </div>
+            </td>
+            <td>
+              <div class="alert alert-danger py-xs">
+                <span class="text-xs">{{ item.vulnerable }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="alert alert-success py-xs">
+                <span class="text-xs">{{ item.protected }}</span>
+              </div>
+            </td>
+            <td>
+              <code class="hash-badge">{{ item.target_endpoint }}</code>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

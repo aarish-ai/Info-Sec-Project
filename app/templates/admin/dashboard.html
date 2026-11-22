@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel · User & System Management{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="flex-row justify-between items-center mb-lg flex-wrap gap-md">
+    <div>
+      <h1 class="card-title">System Administration Control Center</h1>
+      <p class="card-subtitle">
+        Manage registered user accounts, review account lockout states, and control system-wide security configurations.
+      </p>
+    </div>
+    <div class="flex-row gap-sm items-center">
+      <a href="/admin/secure-mode" class="btn btn-outline">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        SECURE_MODE Switch Matrix
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Metrics Overview -->
+  <div class="grid-4 mb-xl">
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="feature-title">{{ total_users }}</div>
+      <div class="feature-desc">Registered User Accounts</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="feature-title text-danger">{{ locked_count }}</div>
+      <div class="feature-desc">Locked Accounts (5 Failed Logins)</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+      </div>
+      <div class="feature-title">{{ total_media }}</div>
+      <div class="feature-desc">Encrypted Media Assets Registered</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="feature-title">
+        {% if secure_mode %}
+          <span class="text-success text-lg">PROTECTED</span>
+        {% else %}
+          <span class="text-danger text-lg">VULNERABLE</span>
+        {% endif %}
+      </div>
+      <div class="feature-desc">SECURE_MODE Runtime State</div>
+    </div>
+  </div>
+
+  <!-- Search / Filter Bar (OWASP A03 SQL Injection Demonstrator) -->
+  <div class="card-glass mb-lg">
+    <form action="/admin/search" method="GET" class="flex-row gap-sm items-center flex-wrap">
+      <div class="flex-1">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ query or '' }}" 
+          placeholder="Search by username or email address..." 
+          class="input-terminal"
+        >
+      </div>
+      <button type="submit" class="btn btn-secondary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Search Users
+      </button>
+      {% if query %}
+        <a href="/admin" class="btn btn-outline">Clear</a>
+      {% endif %}
+      <span class="text-dim text-xs ml-auto">
+        Search Query Execution: 
+        {% if secure_mode %}
+          <span class="badge-status badge-authentic">Parameterized Safe Query</span>
+        {% else %}
+          <span class="badge-status badge-modified">Raw String Interpolation (SQLi Vulnerable)</span>
+        {% endif %}
+      </span>
+    </form>
+  </div>
+
+  <!-- User Accounts Table -->
+  <div class="table-container card-glass">
+    <table class="table-vault">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Username</th>
+          <th>Email Address</th>
+          <th>Role</th>
+          <th>Account Status</th>
+          <th>Failed Attempts</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td class="font-mono text-sm">#{{ u.user_id }}</td>
+            <td>
+              <strong>{{ u.username }}</strong>
+            </td>
+            <td class="text-muted">{{ u.email }}</td>
+            <td>
+              <span class="badge-status badge-role">{{ u.role }}</span>
+            </td>
+            <td>
+              {% if u.is_locked %}
+                <span class="badge-status badge-modified">Locked</span>
+              {% else %}
+                <span class="badge-status badge-authentic">Active</span>
+              {% endif %}
+            </td>
+            <td class="font-mono text-center">
+              <span class="{{ 'text-danger font-bold' if u.failed_login_attempts >= 5 else 'text-muted' }}">
+                {{ u.failed_login_attempts }} / 5
+              </span>
+            </td>
+            <td>
+              {% if u.is_locked or u.failed_login_attempts > 0 %}
+                <form action="/admin/unlock/{{ u.user_id }}" method="POST">
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                    </svg>
+                    Unlock Account
+                  </button>
+                </form>
+              {% else %}
+                <span class="text-dim text-xs">No Action Required</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-lg">
+              No user accounts found matching query.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

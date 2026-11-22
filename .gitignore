@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+.pytest_cache/
+storage/encrypted_media/*
+!storage/encrypted_media/.gitkeep
+storage/key_storage/*
+!storage/key_storage/.gitkeep

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Two-Factor Authentication{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <div class="card-glass">
+    
+    <div class="card-header text-center">
+      <div class="flex-row justify-center gap-xs">
+        <span class="badge-status badge-info">Step 2 of 2 · Mandatory MFA</span>
+      </div>
+      <h2>Activate Authenticator App</h2>
+      <p class="text-muted">Scan the QR code below using Google Authenticator, Authy, or 1Password to activate your account.</p>
+    </div>
+
+    <!-- QR Code Display Box -->
+    <div class="text-center">
+      <div class="totp-qr-wrapper">
+        <img src="/auth/totp-qr" alt="TOTP Authenticator Setup QR Code" class="totp-qr-image">
+      </div>
+    </div>
+
+    <!-- Manual Secret Key Fallback -->
+    <div class="form-group text-center">
+      <label class="form-label justify-center">
+        <span>Manual Secret Key (If unable to scan)</span>
+      </label>
+      <div class="flex-row justify-center items-center gap-xs flex-wrap">
+        <code id="totp-secret-key" class="hash-badge font-mono">{{ totp_secret or session.get('pending_totp_secret', 'SECRET-KEY-PENDING') }}</code>
+        <button type="button" class="btn btn-secondary btn-sm" data-copy-target="totp-secret-key">
+          Copy
+        </button>
+      </div>
+      <span class="form-hint">Time-step: 30 seconds · Algorithm: SHA-1 · Digits: 6</span>
+    </div>
+
+    <!-- Verification Form -->
+    <form method="POST" action="/auth/setup-2fa" class="card-body">
+      <div class="form-group">
+        <label for="code" class="form-label justify-center">Enter 6-Digit Verification Code</label>
+        <input 
+          type="text" 
+          id="code" 
+          name="code" 
+          class="input-terminal font-mono text-center input-code-display" 
+          placeholder="000000" 
+          maxlength="6" 
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          required 
+          autocomplete="one-time-code"
+          autofocus
+        >
+        <span class="form-hint text-center">Enter the one-time code shown in your authenticator app to confirm setup.</span>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Verify & Activate Account
+        </button>
+      </div>
+    </form>
+
+    <div class="card-footer text-center">
+      <span class="text-dim">MFA is required for all MediaGuard operations according to strict security policy.</span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
