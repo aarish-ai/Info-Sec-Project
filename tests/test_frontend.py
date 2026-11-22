@@ -88,6 +88,20 @@ def test_css_variables_contain_all_design_tokens():
     for token in required_tokens:
         assert token in content, f"variables.css missing required design token: {token}"
 
+def test_tactical_obsidian_tokens_exist():
+    """Verify variables.css defines the obsidian and lava red tactical design tokens."""
+    css_path = Path(__file__).resolve().parent.parent / 'app' / 'static' / 'css' / 'variables.css'
+    assert css_path.exists(), "variables.css must exist"
+    content = css_path.read_text(encoding='utf-8')
+
+    tactical_tokens = [
+        '--bg-void', '--bg-chassis', '--bg-plate', '--bg-aperture',
+        '--lava-core', '--signal-emerald', '--signal-amber', '--font-display'
+    ]
+
+    for token in tactical_tokens:
+        assert token in content, f"variables.css missing required tactical design token: {token}"
+
 def test_style_css_contains_all_component_classes():
     """Verify style.css implements all standardized component classes."""
     style_path = Path(__file__).resolve().parent.parent / 'app' / 'static' / 'css' / 'style.css'

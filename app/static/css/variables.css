@@ -1,67 +1,94 @@
 /**
- * MediaGuard - Modern Dark-Mode Design System Tokens
+ * MediaGuard - Tactical Obsidian & Lava Red Design System Tokens
  * CS-353 Information Security · NUST SEECS
  * All colors, typography, elevations, and radii defined as centralized CSS variables.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap');
+
 :root {
   /* ==========================================================================
-     Base Backgrounds
+     Tactical Obsidian Canvas
      ========================================================================== */
-  --bg-base: #0b0f19;
-  --bg-surface: #111827;
-  --bg-elevated: #1e293b;
-  --bg-card: rgba(17, 24, 39, 0.75);
+  --bg-void: #050507;
+  --bg-chassis: #0b0c10;
+  --bg-plate: #121319;
+  --bg-aperture: #08090d;
+  --bg-subplate: #181a24;
+
+  /* Mapped Base Backgrounds */
+  --bg-base: var(--bg-void);
+  --bg-surface: var(--bg-plate);
+  --bg-elevated: var(--bg-subplate);
+  --bg-card: rgba(18, 19, 25, 0.95);
 
   /* ==========================================================================
-     Borders
+     Hairline Tactical Borders
      ========================================================================== */
-  --border-subtle: #1e293b;
-  --border-default: #334155;
-  --border-focus: #6366f1;
+  --border-laser: #1f222e;
+  --border-tactical: #2b3042;
+  --border-focus-laser: #ff2a4b;
+
+  /* Mapped Borders */
+  --border-subtle: var(--border-laser);
+  --border-default: var(--border-tactical);
+  --border-focus: var(--border-focus-laser);
 
   /* ==========================================================================
-     Brand / Primary
+     Lava Red Core (Brand / Primary)
      ========================================================================== */
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.25);
+  --lava-core: #ff2a4b;
+  --lava-hot: #ff4765;
+  --lava-ember: #b3142d;
+  --lava-glow: rgba(255, 42, 75, 0.20);
+  --lava-dim: rgba(255, 42, 75, 0.08);
+
+  /* Mapped Brand / Primary */
+  --primary: var(--lava-core);
+  --primary-hover: var(--lava-hot);
+  --primary-glow: var(--lava-glow);
 
   /* ==========================================================================
-     Status Colors
+     Cryptographic Status Signals
      ========================================================================== */
+  --signal-emerald: #00e599;
+  --signal-crimson: #ff2a4b;
+  --signal-amber: #ffaa00;
+  --signal-cyan: #00f0ff;
+
   /* Success (Authentic) */
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --success-border: #059669;
+  --success: var(--signal-emerald);
+  --success-bg: rgba(0, 229, 153, 0.08);
+  --success-border: rgba(0, 229, 153, 0.3);
 
   /* Danger (Tampered / Modified) */
-  --danger: #f43f5e;
-  --danger-bg: rgba(244, 63, 94, 0.1);
-  --danger-border: #e11d48;
+  --danger: var(--signal-crimson);
+  --danger-bg: rgba(255, 42, 75, 0.08);
+  --danger-border: rgba(255, 42, 75, 0.3);
 
   /* Warning (Unknown / Suspicious) */
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --warning-border: #d97706;
+  --warning: var(--signal-amber);
+  --warning-bg: rgba(255, 170, 0, 0.08);
+  --warning-border: rgba(255, 170, 0, 0.3);
 
   /* Info (Audit / Notice) */
-  --info: #38bdf8;
-  --info-bg: rgba(56, 189, 248, 0.1);
-  --info-border: #0284c7;
+  --info: var(--signal-cyan);
+  --info-bg: rgba(0, 240, 255, 0.08);
+  --info-border: rgba(0, 240, 255, 0.3);
 
   /* ==========================================================================
      Text Hierarchy
      ========================================================================== */
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  --text-main: #f0f2f5;
+  --text-muted: #8b92a5;
+  --text-dim: #4e5569;
 
   /* ==========================================================================
-     Typography
+     Typography & Fonts
      ========================================================================== */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --font-display: 'Space Grotesk', -apple-system, sans-serif;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Font Sizes */
   --text-xs: 0.75rem;    /* 12px */
@@ -74,24 +101,24 @@
   --text-4xl: 2.25rem;   /* 36px */
 
   /* ==========================================================================
-     Borders & Radii
+     Strict 2px Tactical Corners
      ========================================================================== */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-full: 2px;
 
   /* ==========================================================================
-     Box Shadows & Elevations
+     Box Shadows & Tactical Glow Elevations
      ========================================================================== */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 25px var(--primary-glow);
-  --shadow-glow-success: 0 0 25px rgba(16, 185, 129, 0.2);
-  --shadow-glow-danger: 0 0 25px rgba(244, 63, 94, 0.2);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --shadow-lg: 0 12px 28px 0 rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-glow: 0 0 20px var(--lava-glow);
+  --shadow-glow-success: 0 0 20px rgba(0, 229, 153, 0.2);
+  --shadow-glow-danger: 0 0 20px rgba(255, 42, 75, 0.2);
 
   /* ==========================================================================
      Transitions
