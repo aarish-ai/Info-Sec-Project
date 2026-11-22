@@ -1,92 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}Attack Simulations · Security Lab{% endblock %}
+{% block title %}Attack Simulations · Adversarial Lab{% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="page-header">
-    <h1 class="page-title">Security Attack Simulation Suite</h1>
-    <p class="page-subtitle">
-      Controlled adversarial evaluation laboratory demonstrating MediaGuard's cryptographic defenses against 6 OWASP Top 10 attack vectors for university viva presentation.
-    </p>
+  <!-- Top Avionics Header & Specification Strip -->
+  <div class="ledger-header-panel">
+    <div>
+      <div class="ledger-spec-rail mb-xs">
+        <span class="telemetry-pill">[FACILITY: ADVERSARIAL LAB]</span>
+        <span class="telemetry-pill">[TARGET: OWASP TOP 10]</span>
+        <span class="telemetry-pill">[TELEMETRY: REAL-TIME STDOUT]</span>
+      </div>
+      <h1 class="page-title text-3xl font-display">Security Attack Simulation Suite</h1>
+      <p class="page-subtitle text-muted text-sm">
+        Adversarial Defense Evaluation Laboratory: Controlled environment to dispatch exploit vectors against MediaGuard's dual-check cryptographic defenses with microsecond telemetry logging.
+      </p>
+    </div>
+    <div class="flex-row gap-sm items-center">
+      <span class="telemetry-pill">[SIMULATOR ARMED]</span>
+    </div>
   </div>
 
-  <!-- Real-time Diagnostic Terminal Console -->
-  <div class="card-glass mb-xl" id="terminal-card">
-    <div class="card-header flex-row justify-between items-center">
+  <!-- Top Oscilloscope / Telemetry Command Terminal Console -->
+  <div class="card-glass oscilloscope-card mb-xl" id="terminal-card">
+    <div class="oscilloscope-header flex-row justify-between items-center">
       <div class="flex-row items-center gap-xs">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="4 17 10 11 4 5"/>
-          <line x1="12" y1="19" x2="20" y2="19"/>
-        </svg>
-        <strong>Cryptographic Diagnostic Console</strong>
+        <span class="oscilloscope-glyph font-mono text-primary">[OSCILLOSCOPE_CH1]</span>
+        <strong class="font-mono text-xs">// CRYPTOGRAPHIC TELEMETRY &amp; ATTACK SCANNER</strong>
       </div>
-      <span class="badge-status badge-info" id="console-status-pill">System Ready</span>
+      <div class="flex-row items-center gap-sm">
+        <span class="telemetry-clock font-mono text-xs text-dim" id="telemetry-clock">UTC 00:00:00.000</span>
+        <span class="badge-status badge-info font-mono text-xs" id="console-status-pill">[STANDBY // READY]</span>
+      </div>
     </div>
 
-    <div class="card-body">
-      <div id="simulation-output-empty" class="text-center py-lg {% if active_result %}hidden{% endif %}">
-        <p class="text-dim text-sm">Select any attack below and click <strong>"Run Attack Simulation"</strong> to execute live cryptographic telemetry.</p>
+    <div class="oscilloscope-screen scanline-screen">
+      <!-- Animated Scanline Laser Beam -->
+      <div class="scanline-beam" aria-hidden="true"></div>
+
+      <!-- Standby Reticle State -->
+      <div id="simulation-output-empty" class="oscilloscope-empty-state text-center py-xl {% if active_result %}hidden{% endif %}">
+        <div class="radar-reticle" aria-hidden="true"></div>
+        <p class="font-mono text-dim text-sm mt-md">
+          [STANDBY]: Select any attack vector below and click <strong>"[EXECUTE EXPLOIT VECTOR]"</strong> to stream real-time cryptographic defense proofs.
+        </p>
       </div>
 
+      <!-- Active Telemetry Stream State -->
       <div id="simulation-output-active" class="flex-col gap-md {% if not active_result %}hidden{% endif %}">
         <div class="flex-row justify-between items-center flex-wrap gap-sm">
           <div>
-            <h3 id="result-title" class="text-main">{{ active_result.title if active_result else '' }}</h3>
-            <span id="result-owasp" class="text-dim text-xs">{{ active_result.owasp if active_result else '' }}</span>
+            <h3 id="result-title" class="font-display text-xl text-main">
+              {{ active_result.title if active_result else '' }}
+            </h3>
+            <span id="result-owasp" class="badge-status badge-info font-mono text-xs">
+              {{ active_result.owasp if active_result else '' }}
+            </span>
           </div>
           <div id="result-status-container">
             {% if active_result %}
               {% if active_result.status in ['BLOCKED', 'DETECTED'] %}
-                <span class="badge-status badge-authentic">{{ active_result.status }}: ATTACK MITIGATED</span>
+                <span class="badge-status badge-authentic font-mono text-sm">
+                  {{ active_result.status }}: ATTACK MITIGATED
+                </span>
               {% else %}
-                <span class="badge-status badge-modified">{{ active_result.status }}</span>
+                <span class="badge-status badge-modified font-mono text-sm">
+                  {{ active_result.status }}
+                </span>
               {% endif %}
             {% endif %}
           </div>
         </div>
 
-        <div class="alert alert-info">
+        <!-- Defense Proof Banner -->
+        <div class="alert alert-info defense-proof-alert">
           <div class="alert-content">
-            <strong>Active Defense: </strong>
-            <span id="result-defense">{{ active_result.cryptographic_defense if active_result else '' }}</span>
+            <span class="font-mono text-xs font-bold text-info">[ACTIVE DEFENSE PROOF]:</span>
+            <span id="result-defense" class="font-mono text-xs text-main">
+              {{ active_result.cryptographic_defense if active_result else '' }}
+            </span>
           </div>
         </div>
 
-        <div class="table-container card-glass">
-          <pre class="font-mono text-sm p-md text-main" id="result-log">{{ active_result.diagnostic_log if active_result else '' }}</pre>
+        <!-- Real-Time Stdout Terminal Stream with Microsecond Logs -->
+        <div class="stdout-terminal-container">
+          <div class="stdout-terminal-bar flex-row justify-between font-mono text-xs text-dim">
+            <span>STDOUT_STREAM // MICROSECOND TELEMETRY INTERCEPT</span>
+            <span>FORMAT: ANSI_CANONICAL // ENCODING: UTF-8</span>
+          </div>
+          <pre class="stdout-pre font-mono text-xs" id="result-log">{{ active_result.diagnostic_log if active_result else '' }}</pre>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 6 Attack Simulation Cards Grid -->
-  <div class="grid-3 mb-xl">
+  <div class="soc-section-bar">
+    <div class="flex-row items-center gap-xs">
+      <h3 class="font-display">Adversarial Attack Vector Catalog (6 Scenarios)</h3>
+    </div>
+    <span class="font-mono text-xs text-dim">[ARMING PROTOCOL: READY]</span>
+  </div>
+
+  <div class="attack-grid mb-xl">
     {% for attack in attacks %}
-      <div class="card-glass card-glass-hover flex-col justify-between" id="card-{{ attack.id }}">
+      <div class="card-glass attack-card flex-col justify-between" id="card-{{ attack.id }}">
         <div>
           <div class="flex-row justify-between items-center mb-xs">
-            <span class="badge-status badge-role">{{ attack.id }}</span>
-            <span class="badge-status badge-warning">Simulated</span>
+            <span class="badge-status badge-role font-mono text-xs">{{ attack.id }}</span>
+            <span class="badge-status badge-warning font-mono text-xs">[SIMULATION_READY]</span>
           </div>
-          <h4 class="card-title text-lg mb-xs">{{ attack.title }}</h4>
-          <span class="badge-status badge-info text-xs mb-sm">{{ attack.owasp.split('–')[0] }}</span>
-          <p class="card-desc text-sm text-muted mb-md">{{ attack.description }}</p>
-          <div class="text-dim text-xs mb-md">
-            <strong>Target: </strong>{{ attack.target }}
+          <h4 class="card-title text-base mb-xs font-display text-main">{{ attack.title }}</h4>
+          <span class="badge-status badge-info text-xs mb-sm font-mono">{{ attack.owasp.split('–')[0] }}</span>
+          <p class="card-desc text-xs text-muted mb-sm">{{ attack.description }}</p>
+          <div class="attack-target-plate font-mono text-xs text-dim mb-md">
+            <span class="text-dim">TARGET: </span><span class="text-main">{{ attack.target }}</span>
           </div>
         </div>
 
         <div class="card-footer">
           <button 
             type="button" 
-            class="btn btn-primary btn-block btn-run-attack" 
+            class="btn btn-primary btn-block btn-run-attack btn-arming-toggle font-mono" 
             data-attack-id="{{ attack.id }}"
           >
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"/>
-            </svg>
-            Run Attack Simulation
+            <span class="arming-icon" aria-hidden="true">⚡</span>
+            <span>[EXECUTE EXPLOIT VECTOR]</span>
           </button>
         </div>
       </div>
@@ -95,70 +135,4 @@
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const runButtons = document.querySelectorAll('.btn-run-attack');
-    const emptyBox = document.getElementById('simulation-output-empty');
-    const activeBox = document.getElementById('simulation-output-active');
-    const consolePill = document.getElementById('console-status-pill');
-    const titleEl = document.getElementById('result-title');
-    const owaspEl = document.getElementById('result-owasp');
-    const statusContainer = document.getElementById('result-status-container');
-    const defenseEl = document.getElementById('result-defense');
-    const logEl = document.getElementById('result-log');
-    const terminalCard = document.getElementById('terminal-card');
-
-    runButtons.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const attackId = btn.getAttribute('data-attack-id');
-        btn.disabled = true;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Simulating Attack...';
-        consolePill.textContent = 'Executing Simulation...';
-        consolePill.className = 'badge-status badge-warning';
-
-        try {
-          const res = await fetch(`/experiments/run/${attackId}`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json'
-            }
-          });
-          const data = await res.json();
-
-          if (data.success) {
-            emptyBox.classList.add('hidden');
-            activeBox.classList.remove('hidden');
-
-            titleEl.textContent = data.title;
-            owaspEl.textContent = data.owasp;
-            defenseEl.textContent = data.cryptographic_defense;
-            logEl.textContent = data.diagnostic_log;
-
-            if (data.status === 'BLOCKED' || data.status === 'DETECTED') {
-              statusContainer.innerHTML = `<span class="badge-status badge-authentic">${data.status}: ATTACK MITIGATED</span>`;
-              consolePill.textContent = `${data.status} (Defense Verified)`;
-              consolePill.className = 'badge-status badge-authentic';
-            } else {
-              statusContainer.innerHTML = `<span class="badge-status badge-modified">${data.status}</span>`;
-              consolePill.textContent = data.status;
-              consolePill.className = 'badge-status badge-modified';
-            }
-
-            // Smooth scroll to diagnostic console
-            terminalCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          } else {
-            alert('Failed to execute simulation: ' + (data.error || 'Server Error'));
-          }
-        } catch (err) {
-          alert('Network or server error executing simulation: ' + err.message);
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-        }
-      });
-    });
-  });
-</script>
-{% endblock %}
+{% block extra_scripts %}{% endblock %}

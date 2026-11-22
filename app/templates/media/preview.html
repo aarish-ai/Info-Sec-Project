@@ -4,13 +4,14 @@
 
 {% block content %}
 <div class="container">
-  <div class="flex-row justify-between items-center mb-lg">
+  <!-- Top Navigation & Action Bar -->
+  <div class="flex-row justify-between items-center mb-lg flex-wrap gap-md">
     <div>
-      <div class="badge-status badge-authentic mb-xs">Authenticated & Decrypted</div>
+      <div class="badge-status badge-authentic mb-2xs font-mono">Authenticated & Decrypted</div>
       <h1 class="card-title">{{ media.original_filename }}</h1>
-      <p class="card-subtitle">In-memory decrypted preview. The original ciphertext remains protected on disk via AES-256-GCM.</p>
+      <p class="card-subtitle">Decrypted Evidence Inspection Console · Ephemeral Memory Buffer</p>
     </div>
-    <div class="flex-row gap-xs">
+    <div class="flex-row gap-xs flex-wrap">
       <a href="/media/{{ media.media_id }}/download" class="btn btn-outline">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -32,49 +33,96 @@
   </div>
 
   <div class="grid-2 gap-lg items-start">
-    <div class="preview-container card-glass">
-      <div class="preview-media-wrapper">
+    <!-- Left Flank: Optical Evidence Lightbox -->
+    <div class="card-glass lightbox-plate">
+      <div class="lightbox-header flex-row justify-between items-center mb-xs font-mono text-xs">
+        <span class="text-dim">TARGET: {{ media.original_filename }}</span>
+        <span class="telemetry-pill">[STATUS: DECRYPTED]</span>
+      </div>
+
+      <div class="preview-media-wrapper lightbox-housing">
+        <span class="reticle-corner reticle-tl"></span>
+        <span class="reticle-corner reticle-tr"></span>
+        <span class="reticle-corner reticle-bl"></span>
+        <span class="reticle-corner reticle-br"></span>
+        
         <img src="{{ image_data_uri }}" alt="Decrypted preview of {{ media.original_filename }}" class="preview-img">
+        
+        <div class="watermark-telemetry font-mono">
+          IN-MEMORY DECRYPTED VIEW // CIPHERTEXT PRESERVED ON DISK
+        </div>
+      </div>
+
+      <div class="lightbox-footer flex-row justify-between items-center mt-xs font-mono text-xs text-dim">
+        <span>MIME: {{ media.file_type }}</span>
+        <span>SIZE: {{ "{:,}".format(media.file_size) }} BYTES</span>
       </div>
     </div>
 
-    <div class="card-glass flex-col gap-md">
-      <h3 class="card-title">Cryptographic Provenance</h3>
-      
-      <div class="form-group">
-        <label class="form-label">Media / Certificate ID</label>
-        <div class="input-terminal font-mono">{{ media.media_id }}</div>
+    <!-- Right Flank: Cryptographic Provenance Plate -->
+    <div class="card-glass provenance-plate flex-col gap-md">
+      <div class="plate-heading flex-row justify-between items-center">
+        <h3 class="card-title">Cryptographic Provenance</h3>
+        <span class="badge-status badge-info font-mono">SEC-SPEC-800-57</span>
       </div>
 
       <div class="form-group">
-        <label class="form-label">SHA-256 Digest</label>
-        <div class="input-terminal font-mono">{{ media.sha256_hash }}</div>
+        <label class="form-label font-mono text-xs text-muted">MEDIA / CERTIFICATE ID (UUID-v4)</label>
+        <div class="flex-row items-center gap-xs">
+          <div class="input-terminal font-mono text-sm flex-1">{{ media.media_id }}</div>
+          <button type="button" class="btn btn-secondary btn-sm" data-copy-target="cert-id-copy">Copy</button>
+          <span id="cert-id-copy" class="sr-only">{{ media.media_id }}</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Perceptual Hash (pHash)</label>
-        <div class="input-terminal font-mono">{{ media.phash }}</div>
+        <label class="form-label font-mono text-xs text-muted">SHA-256 BITSTREAM DIGEST</label>
+        <div class="input-terminal font-mono text-xs hash-break">{{ media.sha256_hash }}</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label font-mono text-xs text-muted">PERCEPTUAL HASH (64-BIT DCT pHash)</label>
+        <div class="input-terminal font-mono text-xs">{{ media.phash }}</div>
+      </div>
+
+      <!-- Security Status Badges -->
+      <div class="security-status-block flex-col gap-xs font-mono text-xs">
+        <div class="status-row flex-row justify-between items-center">
+          <span class="text-dim">DIGITAL SIGNATURE:</span>
+          <span class="text-success">[RSA-PSS-2048: VALID]</span>
+        </div>
+        <div class="status-row flex-row justify-between items-center">
+          <span class="text-dim">DISK ENCRYPTION:</span>
+          <span class="text-success">[AES-256-GCM ENVELOPE: SEALED]</span>
+        </div>
+        <div class="status-row flex-row justify-between items-center">
+          <span class="text-dim">IMMUTABLE ANCHOR:</span>
+          <span class="text-success">[BLOCKCHAIN LEDGER: COMMITTED]</span>
+        </div>
       </div>
 
       <div class="grid-2 gap-sm">
         <div class="form-group">
-          <label class="form-label">MIME Content Type</label>
-          <div class="input-terminal">{{ media.file_type }}</div>
+          <label class="form-label font-mono text-xs text-muted">CONTENT TYPE</label>
+          <div class="input-terminal font-mono text-xs">{{ media.file_type }}</div>
         </div>
         <div class="form-group">
-          <label class="form-label">Registered Size</label>
-          <div class="input-terminal">{{ "{:,}".format(media.file_size) }} bytes</div>
+          <label class="form-label font-mono text-xs text-muted">REGISTERED SIZE</label>
+          <div class="input-terminal font-mono text-xs">{{ "{:,}".format(media.file_size) }} bytes</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Registration Timestamp</label>
-        <div class="input-terminal">{{ media.registration_timestamp }}</div>
+        <label class="form-label font-mono text-xs text-muted">REGISTRATION TIMESTAMP (UTC)</label>
+        <div class="input-terminal font-mono text-xs">{{ media.registration_timestamp }}</div>
       </div>
 
-      <div class="mt-sm">
-        <a href="/verify?cert_id={{ media.media_id }}" class="btn btn-secondary">
-          Open in Public Verification Portal &rarr;
+      <div class="flex-row gap-xs mt-sm flex-wrap">
+        <a href="/media/{{ media.media_id }}/certificate" class="btn btn-primary flex-1">
+          Export PDF Certificate
+        </a>
+        <a href="/verify?cert_id={{ media.media_id }}" class="btn btn-secondary flex-1">
+          Cross-Verify in Portal &rarr;
         </a>
       </div>
     </div>

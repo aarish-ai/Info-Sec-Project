@@ -1,165 +1,243 @@
 {% extends "base.html" %}
 
-{% block title %}Verification Verdict · MediaGuard{% endblock %}
+{% block title %}Forensic Inspection Dossier · MediaGuard{% endblock %}
 
 {% block content %}
 <div class="container">
-  <!-- Verdict Banner -->
+  <!-- Forensic Verdict Seal -->
   {% if verdict == 'AUTHENTIC' %}
-    <div class="verdict-banner verdict-authentic card-glass">
-      <div class="badge-status badge-authentic mb-sm">Integrity Verified · Zero Discrepancy</div>
-      <h1 class="verdict-title">MEDIA ASSET AUTHENTIC</h1>
-      <p class="verdict-subtitle">
-        The cryptographic SHA-256 hash of the submitted file matches the registered provenance record exactly,
-        and the RSA-PSS digital signature over the canonical manifest has been cryptographically verified.
+    <div class="verdict-seal verdict-seal-authentic">
+      <div class="badge-status badge-authentic mb-sm font-mono">[INTEGRITY CONFIRMED // ZERO DIVERGENCE]</div>
+      <h1 class="verdict-stamp">[VERDICT: 100% BITWISE AUTHENTIC // RSA-PSS VALID]</h1>
+      <div class="verdict-laser-rule" aria-hidden="true"></div>
+      <p class="verdict-desc">
+        The cryptographic SHA-256 bitstream of the submitted file matches the registered provenance record with zero deviation.
+        The 2048-bit RSA-PSS digital signature over the canonical manifest is cryptographically verified against the registrar's public key.
       </p>
     </div>
   {% elif verdict == 'MODIFIED' %}
-    <div class="verdict-banner verdict-modified card-glass">
-      <div class="badge-status badge-modified mb-sm">Integrity Alert · Hash Mismatch</div>
-      <h1 class="verdict-title">MEDIA ASSET MODIFIED</h1>
-      <p class="verdict-subtitle">
-        The digital signature over the registered manifest is valid, but the cryptographic SHA-256 fingerprint of the
-        submitted file does NOT match the registered digest. The media has been altered, recompressed, or tampered with.
+    <div class="verdict-seal verdict-seal-modified">
+      <div class="badge-status badge-modified mb-sm font-mono">[INTEGRITY ALERT // MODIFIED // CONTENT DIVERGENCE DETECTED]</div>
+      <h1 class="verdict-stamp">[VERDICT: TAMPERED / MODIFIED / HASH MISMATCH]</h1>
+      <div class="verdict-laser-rule" aria-hidden="true"></div>
+      <p class="verdict-desc">
+        The digital signature over the registered manifest is authentic, but the cryptographic SHA-256 bitstream of the submitted file diverges from the registered fingerprint. The media asset has been modified, recompressed, or maliciously manipulated.
       </p>
     </div>
   {% elif verdict == 'INVALID_SIGNATURE' %}
-    <div class="verdict-banner verdict-invalid card-glass">
-      <div class="badge-status badge-modified mb-sm">Security Breach · Invalid Signature</div>
-      <h1 class="verdict-title">FORGED OR TAMPERED MANIFEST</h1>
-      <p class="verdict-subtitle">
-        Cryptographic verification failed: The digital signature is invalid. Either the registration manifest
-        was manipulated in storage or the signature was not created by the registered owner's private signing key.
+    <div class="verdict-seal verdict-seal-invalid">
+      <div class="badge-status badge-modified mb-sm font-mono">[SECURITY BREACH // SIGNATURE VERIFICATION FAILED]</div>
+      <h1 class="verdict-stamp">[VERDICT: FORGED MANIFEST // INVALID RSA-PSS SIGNATURE]</h1>
+      <div class="verdict-laser-rule" aria-hidden="true"></div>
+      <p class="verdict-desc">
+        Cryptographic verification failed: The digital signature over the registration manifest is invalid. Either the manifest record was tampered with in database storage, or the signature was not issued by the registered owner's private signing key.
       </p>
     </div>
   {% else %}
-    <div class="verdict-banner verdict-unknown card-glass">
-      <div class="badge-status badge-warning mb-sm">Asset Not Found</div>
-      <h1 class="verdict-title">UNKNOWN CERTIFICATE</h1>
-      <p class="verdict-subtitle">
-        No registered provenance manifest exists for Certificate ID: <code class="font-mono">{{ cert_id }}</code>.
+    <div class="verdict-seal verdict-seal-unknown">
+      <div class="badge-status badge-warning mb-sm font-mono">[REGISTRY QUERY: ASSET RECORD NOT FOUND]</div>
+      <h1 class="verdict-stamp">[VERDICT: UNREGISTERED ASSET // MANIFEST NOT FOUND]</h1>
+      <div class="verdict-laser-rule" aria-hidden="true"></div>
+      <p class="verdict-desc">
+        No registered cryptographic provenance manifest exists for Certificate ID: <code class="font-mono hash-badge">{{ cert_id }}</code>.
       </p>
     </div>
   {% endif %}
 
   {% if record %}
-    <div class="grid-2 gap-lg items-start mb-xl">
-      <!-- Cryptographic Hash Comparison -->
-      <div class="card-glass flex-col gap-md">
-        <h3 class="card-title">Cryptographic Fingerprint Analysis</h3>
+    <!-- Dual-Rail Hexadecimal Bitstream Comparator -->
+    <div class="bitstream-comparator">
+      <div class="comparator-header">
+        <div class="comparator-title font-mono">// DUAL-RAIL HEXADECIMAL BITSTREAM COMPARATOR</div>
+        {% if hash_match %}
+          <span class="badge-status badge-authentic font-mono">[BITWISE MATCH: 100% IDENTICAL]</span>
+        {% else %}
+          <span class="badge-status badge-modified font-mono">[BITWISE MISMATCH: DIVERGENCE DETECTED]</span>
+        {% endif %}
+      </div>
 
-        <div class="form-group">
-          <label class="form-label">Submitted Filename</label>
-          <div class="input-terminal">{{ submitted_filename }}</div>
+      <!-- Rail 1: Registered SHA-256 Digest -->
+      <div class="hex-rail">
+        <div class="hex-rail-label">
+          <span>REGISTERED MANIFEST DIGEST [SHA-256]</span>
+          <span class="font-mono text-dim">64 HEX NIBBLES // 256 BITS</span>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Registered SHA-256</label>
-          <div class="input-terminal font-mono">{{ record.sha256_hash }}</div>
+        <div class="hex-stream-grid">
+          {% for i in range(0, 64, 4) %}
+            <span class="hex-block block-match">{{ record.sha256_hash[i:i+4] }}</span>
+          {% endfor %}
         </div>
+      </div>
 
-        <div class="form-group">
-          <label class="form-label">Submitted File SHA-256</label>
-          <div class="input-terminal font-mono">{{ submitted_sha256 }}</div>
+      <!-- Rail 2: Submitted File SHA-256 Digest -->
+      <div class="hex-rail">
+        <div class="hex-rail-label">
+          <span>SUBMITTED EVIDENCE STREAM [SHA-256]</span>
+          <span class="font-mono text-dim">BITSTREAM COMPUTED IN RAM</span>
         </div>
+        <div class="hex-stream-grid">
+          {% for i in range(0, 64, 4) %}
+            {% set reg_chunk = record.sha256_hash[i:i+4].lower() %}
+            {% set sub_chunk = submitted_sha256[i:i+4].lower() %}
+            {% if reg_chunk == sub_chunk %}
+              <span class="hex-block block-match">{{ submitted_sha256[i:i+4] }}</span>
+            {% else %}
+              <span class="hex-block block-mismatch" title="Mismatch in block {{ (i//4)+1 }}: expected {{ reg_chunk }}, got {{ sub_chunk }}">{{ submitted_sha256[i:i+4] }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
 
-        <div class="flex-row items-center gap-sm">
-          <span class="form-label">SHA-256 Exact Match:</span>
+      <div class="comparator-summary">
+        <span class="text-dim">SUBMITTED FILENAME: <strong class="text-main font-mono">{{ submitted_filename }}</strong></span>
+        <span>
           {% if hash_match %}
-            <span class="badge-status badge-authentic">MATCH (100% Bit-for-Bit Identical)</span>
+            <span class="text-success font-mono">0 / 64 NIBBLES DIVERGENT (100% EXACT BITSTREAM MATCH)</span>
           {% else %}
-            <span class="badge-status badge-modified">MISMATCH (Content Altered)</span>
+            <span class="text-danger font-mono">CRYPTOGRAPHIC DIVERGENCE DETECTED IN STREAM</span>
           {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Dual Grid: pHash Diagnostics & Provenance Manifest -->
+    <div class="grid-2 gap-lg items-start mb-xl">
+      <!-- Left Column: pHash Perceptual Hash Diagnostic & Visual Gauge -->
+      <div class="card-glass flex-col gap-md">
+        <div class="card-header pb-xs mb-xs">
+          <div class="badge-status badge-info font-mono mb-2xs">// PERCEPTUAL METRICS</div>
+          <h3 class="card-title text-lg font-display">Discrete Cosine Transform (pHash)</h3>
         </div>
 
         {% if phash_distance is not none and phash_distance >= 0 %}
-          <div class="form-group mt-sm">
-            <label class="form-label">Perceptual Hash (pHash) Diagnostic</label>
-            <div class="table-container">
+          <div class="phash-gauge-container">
+            <div class="phash-metric-header">
+              <span class="font-mono text-muted text-xs">// FREQUENCY INVARIANCE EVALUATION</span>
+              <span>
+                {% if phash_distance == 0 %}
+                  <span class="badge-status badge-authentic font-mono">[PERCEPTUALLY IDENTICAL]</span>
+                {% elif phash_distance <= 10 %}
+                  <span class="badge-status badge-warning font-mono">[TRANSCODED / COMPRESSED]</span>
+                {% else %}
+                  <span class="badge-status badge-modified font-mono">[SUBSTANTIVELY ALTERED]</span>
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="table-container mb-xs">
               <table class="table-vault">
                 <tbody>
                   <tr>
-                    <td>Registered pHash</td>
+                    <td>Registered 64-bit DCT pHash</td>
                     <td><code class="hash-badge">{{ record.phash }}</code></td>
                   </tr>
                   <tr>
-                    <td>Submitted pHash</td>
+                    <td>Submitted 64-bit DCT pHash</td>
                     <td><code class="hash-badge">{{ submitted_phash }}</code></td>
                   </tr>
                   <tr>
-                    <td>Hamming Distance</td>
+                    <td>Hamming Distance ($D_H$)</td>
                     <td>
-                      <strong>{{ phash_distance }} bits</strong>
-                      {% if phash_distance == 0 %}
-                        <span class="badge-status badge-authentic">Identical Perception</span>
-                      {% elif phash_distance <= 10 %}
-                        <span class="badge-status badge-warning">Visually Similar / Transcoded</span>
-                      {% else %}
-                        <span class="badge-status badge-modified">Substantially Different Image</span>
-                      {% endif %}
+                      <strong class="font-mono text-main">{{ phash_distance }} bits</strong> / 64 bits
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
+            <!-- Segmented Gauge Bar (16 Segments = 4 bits per segment, 0 to 64 bits) -->
+            <div class="gauge-track">
+              {% for seg in range(16) %}
+                {% set seg_bit = seg * 4 %}
+                {% set is_active = (phash_distance >= seg_bit) %}
+                {% set is_safe = (phash_distance <= 10) %}
+                <span class="gauge-segment {% if is_active %}{% if is_safe %}segment-lit-green{% else %}segment-lit-red{% endif %}{% endif %}" title="Segment {{ seg+1 }}: {{ seg_bit }}-{{ seg_bit+3 }} bits"></span>
+              {% endfor %}
+            </div>
+            <div class="gauge-scale-legend">
+              <span>0 BITS [EXACT]</span>
+              <span>10 BITS [THRESHOLD]</span>
+              <span>32 BITS</span>
+              <span>64 BITS [ORTHOGONAL]</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="p-md text-dim font-mono text-xs">
+            Perceptual hashing not applicable for non-visual payload streams.
           </div>
         {% endif %}
       </div>
 
-      <!-- Provenance & Signature Details -->
+      <!-- Right Column: Provenance Manifest & RSA-PSS Digital Signature -->
       <div class="card-glass flex-col gap-md">
-        <h3 class="card-title">Provenance & Digital Signature</h3>
-
-        <div class="form-group">
-          <label class="form-label">Certificate / Media ID</label>
-          <div class="input-terminal font-mono">{{ record.media_id }}</div>
+        <div class="card-header pb-xs mb-xs">
+          <div class="badge-status badge-info font-mono mb-2xs">// PROVENANCE RECORD</div>
+          <h3 class="card-title text-lg font-display">Cryptographic Manifest &amp; Signature</h3>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Registered Owner</label>
-          <div class="input-terminal">{{ record.owner_username }}</div>
+          <label class="form-label text-xs font-mono text-muted">Certificate / Media ID</label>
+          <div class="input-terminal font-mono text-xs">{{ record.media_id }}</div>
         </div>
 
         <div class="grid-2 gap-sm">
           <div class="form-group">
-            <label class="form-label">Original Filename</label>
-            <div class="input-terminal">{{ record.original_filename }}</div>
+            <label class="form-label text-xs font-mono text-muted">Registered Owner</label>
+            <div class="input-terminal font-mono text-xs">{{ record.owner_username }}</div>
           </div>
           <div class="form-group">
-            <label class="form-label">MIME Type</label>
-            <div class="input-terminal">{{ record.file_type }}</div>
+            <label class="form-label text-xs font-mono text-muted">MIME Type</label>
+            <div class="input-terminal font-mono text-xs">{{ record.file_type }}</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Registration Timestamp</label>
-          <div class="input-terminal">{{ record.registration_timestamp }}</div>
+          <label class="form-label text-xs font-mono text-muted">Original Filename</label>
+          <div class="input-terminal font-mono text-xs">{{ record.original_filename }}</div>
         </div>
 
-        <div class="flex-row items-center gap-sm">
-          <span class="form-label">RSA-PSS Digital Signature:</span>
+        <div class="grid-2 gap-sm">
+          <div class="form-group">
+            <label class="form-label text-xs font-mono text-muted">Registration Timestamp</label>
+            <div class="input-terminal font-mono text-xs">{{ record.registration_timestamp }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label text-xs font-mono text-muted">Verification Timestamp</label>
+            <div class="input-terminal font-mono text-xs">{{ verification_timestamp }}</div>
+          </div>
+        </div>
+
+        <div class="flex-row items-center justify-between p-sm background-aperture border-laser radius-sm">
+          <span class="font-mono text-xs text-muted">RSA-PSS Digital Signature:</span>
           {% if signature_valid %}
-            <span class="badge-status badge-authentic">VALID & AUTHENTIC</span>
+            <span class="badge-status badge-authentic font-mono">[VALID &amp; NON-REPUDIATED]</span>
           {% else %}
-            <span class="badge-status badge-modified">INVALID / TAMPERED</span>
+            <span class="badge-status badge-modified font-mono">[INVALID // SIGNATURE CHECK FAILED]</span>
           {% endif %}
         </div>
 
-        <div class="flex-row gap-sm mt-md">
-          <a href="/media/{{ record.media_id }}/certificate" class="btn btn-primary">
+        <div class="flex-row gap-sm mt-md flex-wrap">
+          <a href="/media/{{ record.media_id }}/certificate" class="btn btn-primary btn-lava font-mono">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
             Download PDF Certificate
           </a>
-          <a href="/verify" class="btn btn-outline">
-            Verify Another File
+          <a href="/verify" class="btn btn-basalt font-mono">
+            [VERIFY ANOTHER SPECIMEN]
           </a>
         </div>
       </div>
     </div>
   {% else %}
-    <div class="card-glass text-center">
-      <p>Please double-check the Certificate ID or scan the QR code printed on the official MediaGuard Verification Certificate.</p>
-      <div class="mt-md">
-        <a href="/verify" class="btn btn-primary">Try Again</a>
+    <div class="card-glass text-center p-xl">
+      <p class="text-muted mb-md font-mono">
+        No cryptographic manifest was found corresponding to this Certificate UUID. Please verify the ID or scan the QR code printed on the official MediaGuard Verification Certificate.
+      </p>
+      <div>
+        <a href="/verify" class="btn btn-primary btn-lava font-mono">[RE-ENTER CERTIFICATE APERTURE]</a>
       </div>
     </div>
   {% endif %}

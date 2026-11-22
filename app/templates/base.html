@@ -12,65 +12,71 @@
 </head>
 <body>
 
-  <!-- Global Navigation Bar -->
+  <!-- Global Avionics HUD Navigation Bar -->
   <header class="nav-bar">
     <div class="nav-container">
-      <a href="/" class="nav-brand">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <a href="/" class="nav-brand font-mono" title="MediaGuard Avionics Console">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="M9 12l2 2 4-4"/>
         </svg>
-        <span>MediaGuard</span>
+        <span class="hud-brand-text">MEDIA_GUARD // 0xMG</span>
+        <span class="hud-status-indicator" title="System Status: Operational">
+          <span class="hud-led-dot pulse-emerald" aria-hidden="true"></span>
+          <span class="hud-led-label">[ONLINE]</span>
+        </span>
+        <span class="sr-only">MediaGuard</span>
       </a>
 
-      <nav>
-        <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/verify" class="nav-link">Verify File</a></li>
+      <nav aria-label="Avionics Flight Rail">
+        <ul class="nav-links font-mono">
+          <li><a href="/" class="nav-link">//01 INGRESS</a></li>
+          <li><a href="/verify" class="nav-link">//02 VERIFY</a></li>
 
           {% if session.get('user_id') %}
-            <li><a href="/media" class="nav-link">My Media</a></li>
-            <li><a href="/media/upload" class="nav-link">Upload</a></li>
+            <li><a href="/media" class="nav-link">//03 VAULT</a></li>
+            <li><a href="/media/upload" class="nav-link">//04 INGEST</a></li>
 
             {% if session.get('role') in ['Auditor', 'Admin'] %}
-              <li><a href="/audit" class="nav-link">Audit Logs</a></li>
+              <li><a href="/audit" class="nav-link">//05 LEDGER</a></li>
             {% endif %}
 
             {% if session.get('role') == 'Admin' %}
-              <li><a href="/admin" class="nav-link">Admin Panel</a></li>
+              <li><a href="/admin" class="nav-link">//06 ADMIN</a></li>
             {% endif %}
 
-            <li><a href="/experiments" class="nav-link">Experiments</a></li>
+            <li><a href="/experiments" class="nav-link">//07 LAB</a></li>
           {% endif %}
         </ul>
       </nav>
 
-      <div class="nav-user">
+      <div class="nav-user font-mono">
         {% if session.get('user_id') %}
-          <div class="flex-row items-center gap-xs">
-            <span class="nav-user-label">User: <strong>{{ session.get('username') }}</strong></span>
-            <span class="badge-status badge-role">{{ session.get('role') }}</span>
+          <div class="hud-operator-plate">
+            <span class="hud-operator-info">OPERATOR: [{{ session.get('username') }}] // ROLE: [{{ session.get('role') }}]</span>
           </div>
-          <a href="/auth/logout" class="btn btn-secondary btn-sm">Logout</a>
+          <a href="/auth/logout" class="btn btn-secondary btn-sm">[LOGOUT]</a>
         {% else %}
-          <a href="/auth/login" class="btn btn-outline btn-sm">Login</a>
-          <a href="/auth/register" class="btn btn-primary btn-sm">Register</a>
+          <a href="/auth/login" class="btn btn-outline btn-sm">[LOGIN]</a>
+          <a href="/auth/register" class="btn btn-primary btn-sm">[REGISTER]</a>
         {% endif %}
       </div>
     </div>
   </header>
 
-  <!-- Flash Notification Toast Container -->
+  <!-- Flash Notification Toast Container (Tactical HUD Telemetry Intercepts) -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="container">
         <div class="alert-container">
           {% for category, message in messages %}
-            <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else category }}">
+            {% set cat_class = 'danger' if category in ['error', 'danger'] else category %}
+            <div class="alert alert-{{ cat_class }}" role="alert">
               <div class="alert-content">
-                <span>{{ message }}</span>
+                <span class="alert-prefix font-mono">[ALERT_LOG]</span>
+                <span class="alert-message">{{ message }}</span>
               </div>
-              <button type="button" class="alert-close" aria-label="Close alert">&times;</button>
+              <button type="button" class="alert-close font-mono" aria-label="Close alert">[ACK]</button>
             </div>
           {% endfor %}
         </div>
@@ -83,13 +89,18 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Global Footer -->
+  <!-- Global Footer (Avionics Instrument Status Rail) -->
   <footer class="site-footer">
     <div class="footer-content">
-      <div class="footer-meta">
-        <strong>MediaGuard</strong> · Cryptographic Provenance & Dual-Check Media Integrity System
+      <div class="footer-telemetry font-mono">
+        <span class="telemetry-pill">[ENGINE: SHA-256 STREAMED]</span>
+        <span class="telemetry-pill">[CIPHER: AES-256-GCM]</span>
+        <span class="telemetry-pill">[STORAGE: ZERO-PLAINTEXT]</span>
       </div>
-      <div>
+      <div class="footer-meta">
+        <strong>MediaGuard</strong> · Cryptographic Provenance &amp; Dual-Check Media Integrity System
+      </div>
+      <div class="footer-academic">
         CS-353 Information Security · NUST SEECS
       </div>
     </div>

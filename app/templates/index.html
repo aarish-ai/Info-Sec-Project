@@ -1,114 +1,339 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Forensic Workbench · MediaGuard{% endblock %}
 
 {% block content %}
-<section class="page-header">
-  <div class="flex-row justify-center gap-xs">
-    <span class="badge-status badge-info">CS-353 Information Security · NUST SEECS</span>
+<!-- Academic Colophon & Classification -->
+<div class="flex-row justify-center mb-md">
+  <span class="badge-status badge-info font-mono">[ACADEMIC PROTOCOL: CS-353 Information Security · NUST SEECS]</span>
+</div>
+
+<!-- Asymmetric Forensic Workbench Hero -->
+<section class="workbench-hero">
+  <!-- Left Flank: Primary Ingress & Directives -->
+  <div class="workbench-flank-left">
+    <div class="workbench-eyebrow">
+      <span class="hud-led-dot pulse-emerald" aria-hidden="true"></span>
+      <span>MediaGuard // Cryptographic Provenance Engine</span>
+    </div>
+    
+    <h1 class="workbench-title">ZERO-TAMPER MEDIA PROVENANCE</h1>
+    
+    <p class="workbench-subhead">
+      Bit-level SHA-256 verification and 64-bit DCT perceptual hash dual-check engine. Cryptographic certainty for legal evidence and high-assurance assets.
+    </p>
+
+    <div class="workbench-actions">
+      <a href="/verify" class="btn btn-primary btn-lava btn-lg font-mono">
+        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        [INITIALIZE PUBLIC VERIFICATION]
+      </a>
+      {% if not session.get('user_id') %}
+        <a href="/auth/login" class="btn btn-secondary btn-basalt btn-lg font-mono">
+          <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          [VAULT INGRESS]
+        </a>
+      {% else %}
+        <a href="/media" class="btn btn-secondary btn-basalt btn-lg font-mono">
+          <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+          </svg>
+          [VAULT INGRESS]
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="flex-row items-center gap-sm font-mono text-xs text-muted">
+      <span class="hud-led-dot pulse-emerald" aria-hidden="true"></span>
+      <span>SYSTEM OPERATIONAL: ZERO-PLAINTEXT ENFORCED</span>
+      <span>·</span>
+      <span>2048-BIT RSA-PSS SIGNATURE VALIDATION ACTIVE</span>
+    </div>
   </div>
-  <h1 class="page-title">Cryptographic Provenance & Dual-Check Media Integrity</h1>
-  <p class="page-subtitle">
-    Eliminating digital evidence tampering through streamed SHA-256 cryptographic verification,
-    perceptual hashing (pHash), AES-256-GCM envelope encryption, and dual RSA-PSS digital signatures.
-  </p>
-  
-  <div class="flex-row justify-center gap-md flex-wrap">
-    <a href="/verify" class="btn btn-primary btn-lg">
-      <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-        <polyline points="22 4 12 14.01 9 11.01"/>
-      </svg>
-      Verify a File Now (Public)
-    </a>
-    {% if not session.get('user_id') %}
-      <a href="/auth/login" class="btn btn-outline btn-lg">Access Portal / Register</a>
-    {% else %}
-      <a href="/media" class="btn btn-secondary btn-lg">Open Media Vault</a>
-    {% endif %}
+
+  <!-- Right Flank: Live Cryptographic Telemetry HUD Widget -->
+  <div class="workbench-flank-right">
+    <div class="telemetry-hud-widget">
+      <div class="telemetry-hud-header">
+        <span>// LIVE CRYPTOGRAPHIC TELEMETRY HUD</span>
+        <div class="telemetry-hud-status">
+          <span class="hud-led-dot pulse-emerald" aria-hidden="true"></span>
+          <span>ONLINE // 0xSTREAM</span>
+        </div>
+      </div>
+
+      <!-- Active Simulated Chunk Stream Console -->
+      <div class="telemetry-stream-console">
+        <div class="stream-line">
+          <span class="stream-label">CHUNK_01 [SHA-256]:</span>
+          <span class="stream-val font-mono">0x7e3a9f1c..4b8d</span>
+          <span class="stream-val-ok">[VALID]</span>
+        </div>
+        <div class="stream-line">
+          <span class="stream-label">CHUNK_02 [AES-GCM]:</span>
+          <span class="stream-val font-mono">0x4d2b8a0e..92a1</span>
+          <span class="stream-val-ok">[AUTH_TAG_OK]</span>
+        </div>
+        <div class="stream-line">
+          <span class="stream-label">CHUNK_03 [RSA-PSS]:</span>
+          <span class="stream-val font-mono">0x91f03c5d..fe39</span>
+          <span class="stream-val-ok">[NON_REPUDIATED]</span>
+        </div>
+        <div class="stream-line">
+          <span class="stream-label">BUFFER STREAM:</span>
+          <span class="stream-val-active font-mono">[STREAM_RATE: 64MB/S // CHUNK_PIPE_LOCKED]</span>
+        </div>
+      </div>
+
+      <!-- 64-Bit DCT Perceptual Frequency Matrix -->
+      <div class="dct-matrix-panel">
+        <div class="dct-matrix-label">
+          <span>64-Bit DCT Perceptual Frequency Matrix</span>
+          <span class="font-mono text-xs text-dim">8x8 FREQ PLANE</span>
+        </div>
+        
+        <div class="dct-grid">
+          <!-- Row 1: DC + Low Frequencies -->
+          <span class="dct-cell dct-cell-dc" title="DC Coefficient (Mean Luminance)">DC</span>
+          <span class="dct-cell dct-cell-hi">01</span>
+          <span class="dct-cell dct-cell-hi">02</span>
+          <span class="dct-cell dct-cell-mid">03</span>
+          <span class="dct-cell dct-cell-mid">04</span>
+          <span class="dct-cell">05</span>
+          <span class="dct-cell">06</span>
+          <span class="dct-cell">07</span>
+          <!-- Row 2 -->
+          <span class="dct-cell dct-cell-hi">08</span>
+          <span class="dct-cell dct-cell-hi">09</span>
+          <span class="dct-cell dct-cell-mid">10</span>
+          <span class="dct-cell dct-cell-mid">11</span>
+          <span class="dct-cell">12</span>
+          <span class="dct-cell">13</span>
+          <span class="dct-cell">14</span>
+          <span class="dct-cell">15</span>
+          <!-- Row 3 -->
+          <span class="dct-cell dct-cell-hi">16</span>
+          <span class="dct-cell dct-cell-mid">17</span>
+          <span class="dct-cell dct-cell-mid">18</span>
+          <span class="dct-cell">19</span>
+          <span class="dct-cell">20</span>
+          <span class="dct-cell">21</span>
+          <span class="dct-cell">22</span>
+          <span class="dct-cell">23</span>
+          <!-- Row 4 -->
+          <span class="dct-cell dct-cell-mid">24</span>
+          <span class="dct-cell dct-cell-mid">25</span>
+          <span class="dct-cell">26</span>
+          <span class="dct-cell">27</span>
+          <span class="dct-cell">28</span>
+          <span class="dct-cell">29</span>
+          <span class="dct-cell">30</span>
+          <span class="dct-cell">31</span>
+          <!-- Row 5 -->
+          <span class="dct-cell dct-cell-mid">32</span>
+          <span class="dct-cell">33</span>
+          <span class="dct-cell">34</span>
+          <span class="dct-cell">35</span>
+          <span class="dct-cell">36</span>
+          <span class="dct-cell">37</span>
+          <span class="dct-cell">38</span>
+          <span class="dct-cell">39</span>
+          <!-- Row 6 -->
+          <span class="dct-cell">40</span>
+          <span class="dct-cell">41</span>
+          <span class="dct-cell">42</span>
+          <span class="dct-cell">43</span>
+          <span class="dct-cell">44</span>
+          <span class="dct-cell">45</span>
+          <span class="dct-cell">46</span>
+          <span class="dct-cell">47</span>
+          <!-- Row 7 -->
+          <span class="dct-cell">48</span>
+          <span class="dct-cell">49</span>
+          <span class="dct-cell">50</span>
+          <span class="dct-cell">51</span>
+          <span class="dct-cell">52</span>
+          <span class="dct-cell">53</span>
+          <span class="dct-cell">54</span>
+          <span class="dct-cell">55</span>
+          <!-- Row 8: High Frequencies -->
+          <span class="dct-cell">56</span>
+          <span class="dct-cell">57</span>
+          <span class="dct-cell">58</span>
+          <span class="dct-cell">59</span>
+          <span class="dct-cell">60</span>
+          <span class="dct-cell">61</span>
+          <span class="dct-cell">62</span>
+          <span class="dct-cell">63</span>
+        </div>
+
+        <div class="dct-readout">
+          <span class="text-dim">PERCEPTUAL DIVERGENCE:</span>
+          <span class="dct-divergence-val">0.000000 bits // BITWISE IDENTICAL</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Core Verification Guarantees -->
-<section class="grid-3">
-  <div class="feature-card">
-    <div class="feature-icon-wrapper">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    </div>
-    <h3 class="feature-title">Cryptographic Provenance</h3>
-    <p class="feature-desc">
-      Strict Key Separation Principle enforces independent 2048-bit RSA key pairs: RSA-PSS for non-repudiation digital signatures and RSA-OAEP for AES-GCM envelope key wrapping.
-    </p>
+<!-- Single-Line Telemetry Spec Strip -->
+<div class="spec-strip telemetry-strip">
+  <span class="spec-chip">
+    <span class="spec-chip-key">[ SPEC:</span>
+    <span class="spec-chip-val">NIST SP 800-57 ]</span>
+  </span>
+  <span class="spec-divider">·</span>
+  <span class="spec-chip">
+    <span class="spec-chip-key">[ STREAM:</span>
+    <span class="spec-chip-val">SHA-256 ]</span>
+  </span>
+  <span class="spec-divider">·</span>
+  <span class="spec-chip">
+    <span class="spec-chip-key">[ PERCEPTION:</span>
+    <span class="spec-chip-val">64-BIT DCT ]</span>
+  </span>
+  <span class="spec-divider">·</span>
+  <span class="spec-chip">
+    <span class="spec-chip-key">[ CIPHER:</span>
+    <span class="spec-chip-val">AES-256-GCM ]</span>
+  </span>
+</div>
+
+<!-- Tri-Vector Forensic Engine Schematic -->
+<section class="mb-2xl">
+  <div class="mb-md">
+    <span class="badge-status badge-info font-mono">// CORE ARCHITECTURE</span>
+    <h2 class="mt-xs">Tri-Vector Forensic Engine Schematic</h2>
+    <p class="text-muted text-sm">Three independent cryptographic vectors guaranteeing confidentiality, authenticity, and non-repudiation.</p>
   </div>
 
-  <div class="feature-card">
-    <div class="feature-icon-wrapper">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/>
-        <line x1="16" y1="17" x2="8" y2="17"/>
-        <polyline points="10 9 9 9 8 9"/>
-      </svg>
+  <div class="tri-vector-schematic">
+    <!-- Vector 01 -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <span class="vector-index">VECTOR 01</span>
+        <span class="vector-spec-tag">CONFIDENTIALITY</span>
+      </div>
+      <h3 class="vector-title">Cryptographic Envelope (AES-GCM / RSA-OAEP)</h3>
+      <p class="vector-body">
+        Strict Zero-Plaintext Storage Policy. Media streams encrypted in 64KB authenticated chunks using AES-256-GCM. Random symmetric data encryption keys are wrapped using 2048-bit RSA-OAEP. Unencrypted buffers wiped immediately from memory.
+      </p>
+      <div class="vector-footer">
+        <span>NIST SP 800-38D</span>
+        <span class="text-main">AES-256-GCM</span>
+      </div>
     </div>
-    <h3 class="feature-title">Dual-Check Verification</h3>
-    <p class="feature-desc">
-      Combines bitwise-exact SHA-256 checksums with 64-bit DCT perceptual hashing (pHash) with Hamming distance classification to distinguish harmless compression from malicious tampering.
-    </p>
-  </div>
 
-  <div class="feature-card">
-    <div class="feature-icon-wrapper">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
+    <!-- Vector 02 -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <span class="vector-index">VECTOR 02</span>
+        <span class="vector-spec-tag">INTEGRITY</span>
+      </div>
+      <h3 class="vector-title">Dual-Check Divergence (SHA-256 + 64-bit DCT pHash)</h3>
+      <p class="vector-body">
+        Exact bitstream SHA-256 collision resistance combined with 64-bit Discrete Cosine Transform perceptual hashing. Evaluates Hamming distance ($D_H \le 10$) to classify benign recompression versus malicious pixel manipulation.
+      </p>
+      <div class="vector-footer">
+        <span>FIPS 180-4 · DCT-II</span>
+        <span class="text-main">DUAL HASH ENGINE</span>
+      </div>
     </div>
-    <h3 class="feature-title">Tamper-Evident Audit</h3>
-    <p class="feature-desc">
-      SHA-256 hash-chained sequential audit ledger ensures zero record manipulation. Every upload, verification check, and administrative action is cryptographically anchored.
-    </p>
+
+    <!-- Vector 03 -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <span class="vector-index">VECTOR 03</span>
+        <span class="vector-spec-tag">NON-REPUDIATION</span>
+      </div>
+      <h3 class="vector-title">Immutable Ledger (SHA-256 Chained Blocks)</h3>
+      <p class="vector-body">
+        Sequential hash-chained blockchain audit trail. Every ingestion, verification transaction, and security event is permanently anchored to the cryptographic digest of the preceding block, eliminating retrospective record manipulation.
+      </p>
+      <div class="vector-footer">
+        <span>RFC 6962 · HASH CHAIN</span>
+        <span class="text-main">CHAINED AUDIT BLOCKS</span>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Technical Architecture Grid -->
-<section class="card-glass">
-  <div class="card-header">
-    <span class="badge-status badge-info">Security Architecture</span>
-    <h2>Defense-in-Depth Implementation</h2>
-    <p class="text-muted">Built according to NIST SP 800-57, RFC 6238, and OWASP Top 10 guidelines.</p>
+<!-- NIST / OWASP Defense Matrix Technical Flow Diagram -->
+<section class="defense-matrix-panel">
+  <div class="defense-matrix-header">
+    <div class="badge-status badge-info font-mono mb-xs">// DEFENSE-IN-DEPTH MATRIX</div>
+    <h2>NIST SP 800-57 &amp; OWASP Top 10 Pipeline</h2>
+    <p class="text-muted text-sm">Four-stage cryptographically enforced execution pipeline mitigating Top 10 vulnerabilities at design time.</p>
   </div>
 
-  <div class="grid-2">
-    <div>
-      <h4>Zero-Plaintext Storage Policy</h4>
-      <p>
-        Uploaded media is immediately encrypted in chunks using AES-256-GCM. Unencrypted temporary files are permanently wiped from disk. The symmetric key is encrypted using the recipient's RSA-OAEP public key.
-      </p>
+  <!-- 4-Stage Flow Schematic -->
+  <div class="defense-flow">
+    <div class="flow-step">
+      <span class="flow-step-num">STAGE 01 // INGRESS</span>
+      <h4 class="flow-step-title">Zero-Plaintext Ingest</h4>
+      <p class="flow-step-desc">Streamed directly into memory. File chunks validated with magic byte inspection prior to disk touch.</p>
     </div>
+    <div class="flow-step">
+      <span class="flow-step-num">STAGE 02 // ENVELOPE</span>
+      <h4 class="flow-step-title">Payload Encryption</h4>
+      <p class="flow-step-desc">AES-256-GCM symmetric ciphertext wrapped with owner's 2048-bit RSA-OAEP public key.</p>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">STAGE 03 // DUAL HASH</span>
+      <h4 class="flow-step-title">Fingerprint Extraction</h4>
+      <p class="flow-step-desc">Parallel calculation of streamed SHA-256 and 64-bit DCT perceptual hash matrix.</p>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">STAGE 04 // ANCHOR</span>
+      <h4 class="flow-step-title">Manifest &amp; Audit Chain</h4>
+      <p class="flow-step-desc">Canonical JSON manifest signed via RSA-PSS and linked into the SHA-256 audit blockchain.</p>
+    </div>
+  </div>
 
-    <div>
-      <h4>Argon2id & RFC 6238 TOTP MFA</h4>
-      <p>
-        Password hashes are protected with Argon2id memory-hard functions. Every account enforces time-based one-time password (TOTP) authenticator verification, with a 5-attempt account lockout policy.
-      </p>
-    </div>
-
-    <div>
-      <h4>Dynamic Signed PDF Certificates</h4>
-      <p>
-        Generates tamper-proof legal verification certificates complete with registration metadata, cryptographic hashes, QR verification link, and the registrar's digital signature.
-      </p>
-    </div>
-
-    <div>
-      <h4>Dual-State SECURE_MODE Demonstrator</h4>
-      <p>
-        An administrative toggle enables side-by-side viva demonstration of 8 OWASP Top 10 vulnerabilities (including SQL injection, path traversal, timing attacks, and IDOR) before and after remediation.
-      </p>
-    </div>
+  <!-- OWASP Defense Mapping Table -->
+  <div class="defense-table-wrap">
+    <table class="defense-table">
+      <thead>
+        <tr>
+          <th>OWASP Category</th>
+          <th>Vulnerability Vector</th>
+          <th>MediaGuard Defense Remediation</th>
+          <th>Assurance Standard</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A02:2021 Cryptographic Failures</td>
+          <td class="dim">Plaintext asset leakage on disk</td>
+          <td>Zero-Plaintext AES-256-GCM Envelope Encryption</td>
+          <td>NIST SP 800-57 / FIPS 140-3</td>
+        </tr>
+        <tr>
+          <td>A01:2021 Broken Access Control</td>
+          <td class="dim">Unauthorized asset decryption / IDOR</td>
+          <td>Strict RBAC &amp; Recipient RSA-OAEP Key Wrapping</td>
+          <td>RFC 8017 / OWASP ASVS 4.0</td>
+        </tr>
+        <tr>
+          <td>A03:2021 Injection</td>
+          <td class="dim">SQL injection in asset lookups</td>
+          <td>Strict Parameterized SQLite Queries across all routes</td>
+          <td>OWASP Proactive Controls C3</td>
+        </tr>
+        <tr>
+          <td>A07:2021 Identification &amp; Auth</td>
+          <td class="dim">Credential stuffing &amp; brute-force</td>
+          <td>Argon2id Memory-Hard Hashes + RFC 6238 TOTP MFA</td>
+          <td>NIST SP 800-63B / RFC 6238</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </section>
 {% endblock %}

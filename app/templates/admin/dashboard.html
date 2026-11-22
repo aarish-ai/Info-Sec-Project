@@ -1,80 +1,74 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Panel · User & System Management{% endblock %}
+{% block title %}SOC Terminal · System Administration{% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="flex-row justify-between items-center mb-lg flex-wrap gap-md">
+  <!-- Top Avionics Header & Controller Panel -->
+  <div class="ledger-header-panel">
     <div>
-      <h1 class="card-title">System Administration Control Center</h1>
-      <p class="card-subtitle">
-        Manage registered user accounts, review account lockout states, and control system-wide security configurations.
+      <div class="ledger-spec-rail mb-xs">
+        <span class="telemetry-pill">[NODE: SOC COMMAND ROOT]</span>
+        <span class="telemetry-pill">[CLEARANCE: TIER-0 ADMIN]</span>
+        <span class="telemetry-pill">[POLICY: ENFORCED]</span>
+      </div>
+      <h1 class="page-title text-3xl font-display">System Administration Control Center</h1>
+      <p class="page-subtitle text-muted text-sm">
+        Security Operations Command Terminal (SOC): Monitor authenticated identities, inspect threat lockouts, and supervise runtime defense postures.
       </p>
     </div>
     <div class="flex-row gap-sm items-center">
-      <a href="/admin/secure-mode" class="btn btn-outline">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <a href="/admin/secure-mode" class="btn btn-outline font-mono">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
           <line x1="8" y1="21" x2="16" y2="21"/>
           <line x1="12" y1="17" x2="12" y2="21"/>
         </svg>
-        SECURE_MODE Switch Matrix
+        <span>[SECURE_MODE HYPERVISOR MATRIX]</span>
       </a>
     </div>
   </div>
 
-  <!-- Quick Metrics Overview -->
-  <div class="grid-4 mb-xl">
-    <div class="feature-card">
-      <div class="feature-icon-wrapper">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-      </div>
-      <div class="feature-title">{{ total_users }}</div>
-      <div class="feature-desc">Registered User Accounts</div>
+  <!-- 4 Tactical Metric Readout Modules (SOC Telemetry Grid) -->
+  <div class="soc-readout-grid mb-xl">
+    <!-- Metric 1: User Headcount -->
+    <div class="soc-metric-module">
+      <span class="soc-metric-label font-mono">User Headcount</span>
+      <div class="soc-metric-value">{{ total_users }}</div>
+      <span class="soc-metric-telemetry">[REGISTERED IDENTITIES]</span>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon-wrapper">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
+    <!-- Metric 2: Threat Lockouts (pulsing red if > 0) -->
+    <div class="soc-metric-module {{ 'soc-module-alert pulse-danger' if locked_count > 0 else '' }}">
+      <span class="soc-metric-label font-mono">Threat Lockouts</span>
+      <div class="soc-metric-value {{ 'pulse-danger-text text-danger' if locked_count > 0 else 'text-muted' }}">
+        {{ locked_count }}
       </div>
-      <div class="feature-title text-danger">{{ locked_count }}</div>
-      <div class="feature-desc">Locked Accounts (5 Failed Logins)</div>
+      <span class="soc-metric-telemetry">
+        {{ '[CRITICAL: 5 FAILED LOGINS]' if locked_count > 0 else '[THREAT LEVEL: NOMINAL]' }}
+      </span>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon-wrapper">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-          <circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-      </div>
-      <div class="feature-title">{{ total_media }}</div>
-      <div class="feature-desc">Encrypted Media Assets Registered</div>
+    <!-- Metric 3: Encrypted Vault Volume -->
+    <div class="soc-metric-module">
+      <span class="soc-metric-label font-mono">Encrypted Vault Volume</span>
+      <div class="soc-metric-value">{{ total_media }}</div>
+      <span class="soc-metric-telemetry">[AES-256-GCM ENVELOPES]</span>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon-wrapper">
-        <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-      </div>
-      <div class="feature-title">
+    <!-- Metric 4: Global Defense Posture -->
+    <div class="soc-metric-module">
+      <span class="soc-metric-label font-mono">Global Defense Posture</span>
+      <div class="soc-metric-value">
         {% if secure_mode %}
-          <span class="text-success text-lg">PROTECTED</span>
+          <span class="text-success">[HARDENED]</span>
         {% else %}
-          <span class="text-danger text-lg">VULNERABLE</span>
+          <span class="text-danger pulse-danger-text">[EXPOSED]</span>
         {% endif %}
       </div>
-      <div class="feature-desc">SECURE_MODE Runtime State</div>
+      <span class="soc-metric-telemetry">
+        {{ '[SECURE_MODE: ACTIVE]' if secure_mode else '[SECURE_MODE: BYPASS]' }}
+      </span>
     </div>
   </div>
 
@@ -86,88 +80,110 @@
           type="text" 
           name="q" 
           value="{{ query or '' }}" 
-          placeholder="Search by username or email address..." 
-          class="input-terminal"
+          placeholder="Search user accounts by username, email, or UID..." 
+          class="input-terminal font-mono"
         >
       </div>
-      <button type="submit" class="btn btn-secondary">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button type="submit" class="btn btn-secondary font-mono">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        Search Users
+        [SEARCH_ACCOUNTS]
       </button>
       {% if query %}
-        <a href="/admin" class="btn btn-outline">Clear</a>
+        <a href="/admin" class="btn btn-outline font-mono">[CLEAR]</a>
       {% endif %}
-      <span class="text-dim text-xs ml-auto">
-        Search Query Execution: 
+      <span class="text-dim font-mono text-xs ml-auto">
+        OWASP A03 Engine: 
         {% if secure_mode %}
-          <span class="badge-status badge-authentic">Parameterized Safe Query</span>
+          <span class="badge-status badge-authentic font-mono">[PARAMETERIZED_SAFE_QUERY]</span>
         {% else %}
-          <span class="badge-status badge-modified">Raw String Interpolation (SQLi Vulnerable)</span>
+          <span class="badge-status badge-modified font-mono">[RAW_SQL_INTERPOLATION // VULNERABLE_SQLI]</span>
         {% endif %}
       </span>
     </form>
   </div>
 
-  <!-- User Accounts Table -->
+  <!-- User Accounts Management Section -->
+  <div class="soc-section-bar">
+    <div class="flex-row items-center gap-xs">
+      <h3 class="font-display">User Accounts Roster & Clearance Matrix</h3>
+    </div>
+    <span class="font-mono text-xs text-dim">[TOTAL: {{ total_users }} RECORDED PROFILES]</span>
+  </div>
+
   <div class="table-container card-glass">
     <table class="table-vault">
       <thead>
         <tr>
           <th>UID</th>
-          <th>Username</th>
+          <th>Operator Identity</th>
           <th>Email Address</th>
-          <th>Role</th>
+          <th>Clearance Level</th>
           <th>Account Status</th>
-          <th>Failed Attempts</th>
-          <th>Actions</th>
+          <th>Failed Login Meter</th>
+          <th>Tactical Override Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for u in users %}
           <tr>
-            <td class="font-mono text-sm">#{{ u.user_id }}</td>
+            <td class="font-mono text-xs text-muted">#{{ u.user_id }}</td>
             <td>
-              <strong>{{ u.username }}</strong>
+              <div class="operator-id-tag font-mono">
+                <strong class="text-main">{{ u.username }}</strong>
+                <span class="clearance-mini-tag text-dim">UID_{{ u.user_id }}</span>
+              </div>
             </td>
-            <td class="text-muted">{{ u.email }}</td>
+            <td class="text-muted font-mono text-xs">{{ u.email }}</td>
             <td>
-              <span class="badge-status badge-role">{{ u.role }}</span>
+              <span class="clearance-tag clearance-{{ u.role|lower }} font-mono">
+                [CLEARANCE: {{ u.role|upper }}]
+              </span>
             </td>
             <td>
               {% if u.is_locked %}
-                <span class="badge-status badge-modified">Locked</span>
+                <span class="badge-status badge-modified font-mono pulse-danger">
+                  [LOCKED // THREAT_DETECTED]
+                </span>
               {% else %}
-                <span class="badge-status badge-authentic">Active</span>
+                <span class="badge-status badge-authentic font-mono">
+                  [ACTIVE // NOMINAL]
+                </span>
               {% endif %}
             </td>
-            <td class="font-mono text-center">
-              <span class="{{ 'text-danger font-bold' if u.failed_login_attempts >= 5 else 'text-muted' }}">
-                {{ u.failed_login_attempts }} / 5
-              </span>
+            <td>
+              <div class="login-meter-container font-mono">
+                {% set attempts = u.failed_login_attempts or 0 %}
+                <span class="meter-bar font-mono {{ 'text-danger' if attempts >= 5 else ('text-warning' if attempts > 0 else 'text-dim') }}">
+                  [{% for i in range(5) %}{{ '■' if i < attempts else '□' }}{% endfor %}]
+                </span>
+                <span class="meter-count font-mono {{ 'text-danger font-bold' if attempts >= 5 else 'text-muted' }}">
+                  {{ attempts }}/5
+                </span>
+              </div>
             </td>
             <td>
               {% if u.is_locked or u.failed_login_attempts > 0 %}
                 <form action="/admin/unlock/{{ u.user_id }}" method="POST">
-                  <button type="submit" class="btn btn-primary btn-sm">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <button type="submit" class="btn btn-primary btn-sm btn-tactical-unlock font-mono">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                       <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
                     </svg>
-                    Unlock Account
+                    [RESET_LOCKOUT]
                   </button>
                 </form>
               {% else %}
-                <span class="text-dim text-xs">No Action Required</span>
+                <span class="text-dim text-xs font-mono">[ZERO_FAULT_STANDBY]</span>
               {% endif %}
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="7" class="text-center text-muted py-lg">
-              No user accounts found matching query.
+            <td colspan="7" class="text-center text-muted py-lg font-mono text-sm">
+              [EMPTY_SET]: No user accounts found matching query.
             </td>
           </tr>
         {% endfor %}

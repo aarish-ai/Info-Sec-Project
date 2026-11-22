@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container container-narrow">
-  <div class="card-glass">
+  <div class="card-glass terminal-housing">
     
     <!-- Tab Switcher -->
     <div class="auth-tabs">
@@ -14,33 +14,43 @@
 
     <div class="card-header text-center">
       <h2>MediaGuard Registration</h2>
-      <p class="text-muted">Enroll to receive dedicated cryptographic key pairs for provenance verification.</p>
+      <p class="text-muted">Identity Provisioning Chamber · Cryptographic Keypair Enrollment</p>
     </div>
 
-    <!-- Explanatory Security Card -->
-    <div class="feature-card">
-      <div class="flex-row items-center gap-xs">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info">
+    <!-- Real-time Keypair Provisioning Readout Strip -->
+    <div class="keypair-readout-strip font-mono">
+      <span class="telemetry-pill">[RSA-PSS-2048: READY]</span>
+      <span class="telemetry-pill">[RSA-OAEP-2048: READY]</span>
+      <span class="telemetry-pill">[ARGON2ID_SALT: ARMED]</span>
+    </div>
+
+    <!-- Integrated Security Notice (No Card-in-Card Nesting) -->
+    <div class="security-readout-plate">
+      <div class="flex-row items-center gap-xs mb-xs">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="16" x2="12" y2="12"/>
           <line x1="12" y1="8" x2="12.01" y2="8"/>
         </svg>
         <span class="badge-status badge-info">Zero-Plaintext Security</span>
       </div>
-      <p class="feature-desc">
-        Upon submission, MediaGuard automatically generates independent 2048-bit RSA-PSS (signing) and RSA-OAEP (encryption) key pairs. Your private keys will be encrypted at rest using AES-256-GCM and an scrypt-derived KEK before storage.
+      <p class="security-readout-text">
+        Provisioning generates dedicated 2048-bit RSA-PSS signing and RSA-OAEP encryption keypairs. Private keys are encrypted via AES-256-GCM using an Argon2id-derived KEK before storage.
       </p>
     </div>
 
-    <form method="POST" action="/auth/register" class="card-body">
+    <form method="POST" action="/auth/register" class="card-body flex-col gap-md">
       <div class="form-group">
-        <label for="username" class="form-label">Username</label>
+        <label for="username" class="form-label font-mono">
+          <span class="aperture-prompt">usr:</span>
+          <span>Username</span>
+        </label>
         <input 
           type="text" 
           id="username" 
           name="username" 
-          class="input-terminal" 
-          placeholder="e.g. alice_investigator" 
+          class="input-terminal font-mono" 
+          placeholder="operator_alias" 
           value="{{ username or '' }}"
           required 
           autocomplete="username"
@@ -49,56 +59,78 @@
       </div>
 
       <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
+        <label for="email" class="form-label font-mono">
+          <span class="aperture-prompt">com:</span>
+          <span>Email Address</span>
+        </label>
         <input 
           type="email" 
           id="email" 
           name="email" 
-          class="input-terminal" 
-          placeholder="alice@agency.gov" 
+          class="input-terminal font-mono" 
+          placeholder="operator@defense.gov" 
           value="{{ email or '' }}"
           required 
           autocomplete="email"
         >
       </div>
 
+      <!-- Industrial Rotary Role Selector -->
       <div class="form-group">
-        <label for="role" class="form-label">Account Role</label>
-        <select id="role" name="role" class="input-terminal form-select">
-          <option value="User" {% if role == 'User' or not role %}selected{% endif %}>User (Media Producer & Verifier)</option>
-          <option value="Auditor" {% if role == 'Auditor' %}selected{% endif %}>Auditor (Compliance & Ledger Inspector)</option>
-          <option value="Admin" {% if role == 'Admin' %}selected{% endif %}>Admin (Full Governance & Security Controls)</option>
-        </select>
-        <span class="form-hint">Roles govern granular access to audit chains and administrative controls.</span>
+        <label for="role" class="form-label font-mono">
+          <span class="aperture-prompt">sec:</span>
+          <span>Operational Role</span>
+        </label>
+        <div class="rotary-switch-housing">
+          <select id="role" name="role" class="input-terminal form-select rotary-select font-mono">
+            <option value="User" {% if role == 'User' or not role %}selected{% endif %}>[OPERATOR] · Media Producer & Verifier</option>
+            <option value="Auditor" {% if role == 'Auditor' %}selected{% endif %}>[AUDITOR] · Compliance & Ledger Inspector</option>
+            <option value="Admin" {% if role == 'Admin' %}selected{% endif %}>[ADMIN] · Full Governance & Security Controls</option>
+          </select>
+          <div class="rotary-dial-indicator font-mono">
+            <span class="dial-step {% if role == 'User' or not role %}dial-active{% endif %}">[OPERATOR]</span>
+            <span class="dial-divider">·</span>
+            <span class="dial-step {% if role == 'Auditor' %}dial-active{% endif %}">[AUDITOR]</span>
+            <span class="dial-divider">·</span>
+            <span class="dial-step {% if role == 'Admin' %}dial-active{% endif %}">[ADMIN]</span>
+          </div>
+        </div>
+        <span class="form-hint font-mono text-xs">Role assignments enforce granular RBAC across cryptographic ledgers and audit chains.</span>
       </div>
 
       <div class="form-group">
-        <label for="password" class="form-label">Master Password</label>
+        <label for="password" class="form-label font-mono">
+          <span class="aperture-prompt">pwd:</span>
+          <span>Master Password</span>
+        </label>
         <input 
           type="password" 
           id="password" 
           name="password" 
-          class="input-terminal" 
-          placeholder="Minimum 12 characters recommended" 
+          class="input-terminal font-mono" 
+          placeholder="Minimum 12 characters (entropy tested)" 
           required 
           autocomplete="new-password"
         >
       </div>
 
       <div class="form-group">
-        <label for="confirm_password" class="form-label">Confirm Master Password</label>
+        <label for="confirm_password" class="form-label font-mono">
+          <span class="aperture-prompt">chk:</span>
+          <span>Confirm Master Password</span>
+        </label>
         <input 
           type="password" 
           id="confirm_password" 
           name="confirm_password" 
-          class="input-terminal" 
+          class="input-terminal font-mono" 
           placeholder="Re-enter master password" 
           required 
           autocomplete="new-password"
         >
       </div>
 
-      <div class="form-group">
+      <div class="form-group mt-sm">
         <button type="submit" class="btn btn-primary btn-block btn-lg">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -112,7 +144,7 @@
     </form>
 
     <div class="card-footer text-center">
-      <span class="text-dim">Already have an account? <a href="/auth/login">Sign in here</a></span>
+      <span class="text-dim font-mono text-xs">Enrolled keys immediately linked to immutable identity root. Already provisioned? <a href="/auth/login">Sign in</a></span>
     </div>
 
   </div>
