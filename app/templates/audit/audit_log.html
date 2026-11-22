@@ -4,30 +4,36 @@
 
 {% block content %}
 <div class="container">
-  <div class="flex-row justify-between items-center mb-lg flex-wrap gap-md">
+  <!-- Top Avionics Header & Controller Panel -->
+  <div class="ledger-header-panel">
     <div>
-      <h1 class="card-title">Cryptographic Audit Trail</h1>
-      <p class="card-subtitle">
-        Tamper-evident, blockchain-style hash-chained log linking every security event with SHA-256 integrity proofs.
+      <div class="ledger-spec-rail mb-xs">
+        <span class="telemetry-pill">[SPEC: SHA-256 HASH CHAIN]</span>
+        <span class="telemetry-pill">[TOPOLOGY: MERKLE-LINKED]</span>
+        <span class="telemetry-pill">[ZERO-COLLISION ANCHORS]</span>
+      </div>
+      <h1 class="page-title text-3xl font-display">Cryptographic Audit Trail</h1>
+      <p class="page-subtitle text-muted text-sm">
+        Tamper-evident, blockchain-style hash-chained ledger linking every security event with SHA-256 integrity proofs.
       </p>
     </div>
     <div class="flex-row gap-sm items-center">
       <form action="/audit/verify-chain" method="POST" id="verify-chain-form">
-        <button type="submit" class="btn btn-primary" id="btn-verify-chain">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="submit" class="btn btn-safety-sweep font-mono" id="btn-verify-chain">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <path d="M9 12l2 2 4-4"/>
           </svg>
-          Verify Entire Audit Chain
+          <span class="sweep-btn-text">[RUN HASH-CHAIN INTEGRITY SWEEP] // Verify Entire Audit Chain</span>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Real-time Verification Badge Container (populated via AJAX or server flash) -->
+  <!-- Real-time Verification Dynamic HUD Banner Container -->
   <div id="chain-status-banner" class="mb-lg"></div>
 
-  <!-- Search and Filter Bar -->
+  <!-- Search and Telemetry Filter Bar -->
   <div class="card-glass mb-lg">
     <form action="/audit" method="GET" class="flex-row gap-sm items-center flex-wrap">
       <div class="flex-1">
@@ -35,78 +41,89 @@
           type="text" 
           name="q" 
           value="{{ query or '' }}" 
-          placeholder="Filter by action, details, user, IP, or hash..." 
-          class="input-terminal"
+          placeholder="Filter ledger blocks by opcode, operator, IP, payload digest, or hash..." 
+          class="input-terminal font-mono"
         >
       </div>
-      <button type="submit" class="btn btn-secondary">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button type="submit" class="btn btn-secondary font-mono">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        Filter Logs
+        [FILTER_LOGS]
       </button>
       {% if query %}
-        <a href="/audit" class="btn btn-outline">Clear</a>
+        <a href="/audit" class="btn btn-outline font-mono">[CLEAR]</a>
       {% endif %}
-      <span class="text-muted text-sm ml-auto">
-        Showing <strong>{{ logs|length }}</strong> of <strong>{{ total }}</strong> recorded entries
+      <span class="text-dim font-mono text-xs ml-auto">
+        LEDGER_BLOCKS: <strong class="text-main">{{ logs|length }}</strong> / {{ total }} COMMITTED
       </span>
     </form>
   </div>
 
   {% if logs %}
     <div class="table-container card-glass">
-      <table class="table-vault">
+      <table class="table-vault ledger-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Block #</th>
             <th>Timestamp (UTC)</th>
-            <th>Actor</th>
-            <th>Security Action</th>
-            <th>Event Details</th>
+            <th>Operator</th>
+            <th>OpCode</th>
+            <th>Payload Digest</th>
             <th>Client IP</th>
-            <th>Cryptographic Current Hash</th>
-            <th>Previous Hash Linkage</th>
+            <th>Prev_Hash ➔ Curr_Hash Anchor</th>
           </tr>
         </thead>
         <tbody>
           {% for log in logs %}
-            <tr>
+            <tr class="ledger-block-row" data-block-id="{{ log.log_id }}">
               <td>
-                <span class="badge-status badge-info">#{{ log.log_id }}</span>
+                <div class="block-index-cell">
+                  <span class="laser-linkage-glyph font-mono">::linkage::</span>
+                  <span class="badge-status badge-info block-badge font-mono">#{{ log.log_id }}</span>
+                </div>
               </td>
-              <td class="font-mono text-sm">{{ log.timestamp }}</td>
+              <td class="font-mono text-xs text-muted">{{ log.timestamp }}</td>
               <td>
                 {% if log.username %}
-                  <div class="flex-col">
-                    <strong>{{ log.username }}</strong>
-                    <span class="text-dim text-xs">{{ log.user_role or 'User' }}</span>
+                  <div class="operator-id-tag font-mono">
+                    <strong class="text-main">{{ log.username }}</strong>
+                    <span class="clearance-mini-tag">[{{ log.user_role or 'User' }}]</span>
                   </div>
                 {% else %}
-                  <span class="text-muted">System / Anonymous</span>
+                  <span class="text-dim font-mono text-xs">[SYSTEM_DAEMON]</span>
                 {% endif %}
               </td>
               <td>
-                <span class="badge-status badge-role">{{ log.action }}</span>
+                <span class="badge-status badge-role opcode-badge font-mono">{{ log.action }}</span>
               </td>
               <td>
-                <span class="text-main">{{ log.details or '—' }}</span>
+                <span class="text-main font-mono text-xs payload-digest" title="{{ log.details or '—' }}">
+                  {{ log.details or '—' }}
+                </span>
               </td>
-              <td class="font-mono text-xs">{{ log.ip_address or '—' }}</td>
+              <td class="font-mono text-xs text-dim">{{ log.ip_address or '—' }}</td>
               <td>
-                <code class="hash-badge" title="{{ log.current_hash }}">
-                  {{ log.current_hash[:10] }}...{{ log.current_hash[-8:] }}
-                </code>
-              </td>
-              <td>
-                {% if log.prev_hash == '0000000000000000000000000000000000000000000000000000000000000000' %}
-                  <span class="badge-status badge-authentic">Genesis Block</span>
-                {% else %}
-                  <code class="hash-badge" title="{{ log.prev_hash }}">
-                    {{ log.prev_hash[:10] }}...{{ log.prev_hash[-8:] }}
-                  </code>
-                {% endif %}
+                <div class="hash-anchor-cell font-mono text-xs">
+                  <div class="hash-flow-prev">
+                    {% if log.prev_hash == '0000000000000000000000000000000000000000000000000000000000000000' or log.log_id == 1 %}
+                      <span class="genesis-seal font-mono" title="Immutable Genesis Hash Anchor">[BLOCK_0 // GENESIS_ANCHOR]</span>
+                    {% else %}
+                      <span class="hash-tag-label text-dim">PREV:</span>
+                      <code class="hash-badge" title="{{ log.prev_hash }}">
+                        {{ log.prev_hash[:10] }}...{{ log.prev_hash[-6:] }}
+                      </code>
+                    {% endif %}
+                  </div>
+                  <span class="hash-flow-connector font-mono text-dim" aria-hidden="true">➔</span>
+                  <div class="hash-flow-curr">
+                    <span class="hash-tag-label text-dim">CURR:</span>
+                    <code class="hash-badge hash-curr-glow" title="{{ log.current_hash }}">
+                      {{ log.current_hash[:10] }}...{{ log.current_hash[-6:] }}
+                    </code>
+                  </div>
+                </div>
               </td>
             </tr>
           {% endfor %}
@@ -115,17 +132,17 @@
     </div>
   {% else %}
     <div class="card-glass text-center py-2xl">
-      <h3 class="text-muted">No Audit Log Entries Found</h3>
-      <p class="text-dim text-sm mt-xs">
+      <h3 class="text-muted font-display">No Audit Log Entries Found</h3>
+      <p class="text-dim text-sm mt-xs font-mono">
         {% if query %}
-          No entries match your search query "{{ query }}". Try resetting filters.
+          [EMPTY_QUERY]: No blockchain blocks match filter pattern "{{ query }}".
         {% else %}
-          The tamper-evident audit log is currently empty.
+          [LEDGER_INITIALIZED]: Tamper-evident blockchain ledger contains 0 blocks.
         {% endif %}
       </p>
       {% if query %}
         <div class="mt-md">
-          <a href="/audit" class="btn btn-secondary btn-sm">Reset Filter</a>
+          <a href="/audit" class="btn btn-secondary btn-sm font-mono">[RESET_FILTER]</a>
         </div>
       {% endif %}
     </div>
@@ -145,7 +162,34 @@
         e.preventDefault();
         verifyBtn.disabled = true;
         const originalText = verifyBtn.innerHTML;
-        verifyBtn.innerHTML = 'Verifying Hash Chain...';
+        verifyBtn.innerHTML = `
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="2" x2="12" y2="6"/>
+            <line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+            <line x1="2" y1="12" x2="6" y2="12"/>
+            <line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+          <span>SWEEPING CHAIN...</span>
+        `;
+
+        statusBanner.innerHTML = `
+          <div class="sweep-hud-container font-mono">
+            <div class="sweep-scan-banner">
+              <div class="flex-row justify-between items-center text-xs">
+                <span class="text-primary font-bold">[INTEGRITY_SWEEP_ACTIVE]</span>
+                <span class="text-dim">RECOMPUTING MERKLE RECURSIVE HASHES...</span>
+              </div>
+              <div class="sweep-progress-track">
+                <div class="sweep-progress-bar"></div>
+              </div>
+              <div class="text-dim text-xs">
+                SWEEPING LEDGER BLOCKS [0x00 ... HEAD] // VERIFYING LINKAGE INTEGRITY
+              </div>
+            </div>
+          </div>
+        `;
 
         try {
           const res = await fetch('/audit/verify-chain', {
@@ -160,17 +204,19 @@
             statusBanner.innerHTML = `
               <div class="alert alert-success">
                 <div class="alert-content">
-                  <span class="badge-status badge-authentic">CRYPTOGRAPHICALLY VALID</span>
-                  <span>${data.message}</span>
+                  <span class="badge-status badge-authentic font-mono">[CHAIN_VERIFIED_INTACT]</span>
+                  <span class="font-mono text-sm">${data.message}</span>
+                  <span class="text-dim font-mono text-xs ml-auto">0xMG SHA-256 HASH-CHAIN INTEGRITY: 100% VALID</span>
                 </div>
               </div>
             `;
           } else {
             statusBanner.innerHTML = `
-              <div class="alert alert-danger">
+              <div class="alert alert-danger pulse-danger">
                 <div class="alert-content">
-                  <span class="badge-status badge-modified">CHAIN INTEGRITY BREACH</span>
-                  <span>${data.message}</span>
+                  <span class="badge-status badge-modified font-mono">[CHAIN_INTEGRITY_BREACH]</span>
+                  <span class="font-mono text-sm">${data.message}</span>
+                  <span class="text-danger font-mono text-xs ml-auto font-bold">FAULT DETECTED AT BLOCK ID: #${data.corrupted_log_id}</span>
                 </div>
               </div>
             `;
@@ -179,7 +225,8 @@
           statusBanner.innerHTML = `
             <div class="alert alert-danger">
               <div class="alert-content">
-                <span>Failed to complete chain verification request.</span>
+                <span class="badge-status badge-modified font-mono">[ERROR]</span>
+                <span class="font-mono text-sm">Failed to execute hash-chain integrity sweep request.</span>
               </div>
             </div>
           `;

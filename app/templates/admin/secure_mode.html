@@ -1,29 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}SECURE_MODE Switch · OWASP Demonstration{% endblock %}
+{% block title %}SECURE_MODE Hypervisor · OWASP Matrix{% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="page-header">
-    <h1 class="page-title">OWASP Top 10 Security Architecture Matrix</h1>
-    <p class="page-subtitle">
-      Academic viva demonstration controller allowing live comparison of vulnerable execution paths vs. active cryptographic defenses.
-    </p>
+  <!-- Top Avionics Header & Specification Strip -->
+  <div class="ledger-header-panel">
+    <div>
+      <div class="ledger-spec-rail mb-xs">
+        <span class="telemetry-pill">[SPEC: OWASP TOP 10 (2021)]</span>
+        <span class="telemetry-pill">[HYPERVISOR: DUAL-STATE]</span>
+        <span class="telemetry-pill">[NIST SP 800-57 COMPLIANT]</span>
+      </div>
+      <h1 class="page-title text-3xl font-display">OWASP Top 10 Security Architecture Matrix</h1>
+      <p class="page-subtitle text-muted text-sm">
+        Dual-State Hypervisor Control Unit: Live academic evaluation switch allowing immediate comparison of vulnerable execution paths against active cryptographic defenses.
+      </p>
+    </div>
+    <div class="flex-row gap-sm items-center">
+      <a href="/admin" class="btn btn-outline font-mono">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span>[RETURN_TO_SOC]</span>
+      </a>
+    </div>
   </div>
 
-  <!-- Master Interactive Toggle Card -->
-  <div class="card-glass mb-xl">
-    <div class="flex-row justify-between items-center flex-wrap gap-md">
-      <div>
-        <div class="flex-row items-center gap-xs mb-xs">
-          <span class="text-dim text-xs">GLOBAL SYSTEM CONTROLLER</span>
+  <!-- Master Industrial Circuit Breaker Housing -->
+  <div class="breaker-card {{ 'breaker-card-active' if secure_mode else 'breaker-card-vulnerable hazard-striping' }} mb-xl">
+    <div class="flex-row justify-between items-center flex-wrap gap-lg">
+      <div class="flex-1">
+        <div class="breaker-status-bar font-mono text-xs">
           {% if secure_mode %}
-            <span class="badge-status badge-authentic">SECURE_MODE: ON (ACTIVE DEFENSES)</span>
+            <span class="breaker-led led-emerald pulse-emerald"></span>
+            <span class="badge-status badge-authentic font-mono">[SECURE_MODE: ON]</span>
+            <span class="text-success font-bold">// HARDENED DEFENSE PROFILE ENGAGED</span>
           {% else %}
-            <span class="badge-status badge-modified">SECURE_MODE: OFF (VULNERABLE VIVA MODE)</span>
+            <span class="breaker-led led-amber pulse-amber"></span>
+            <span class="badge-status badge-modified font-mono pulse-danger">[SECURE_MODE: OFF]</span>
+            <span class="text-warning font-bold pulse-danger-text">// VULNERABLE VIVA DEMONSTRATION MODE ACTIVE</span>
           {% endif %}
         </div>
-        <h2 class="card-title text-2xl mb-xs">
+
+        <h2 class="breaker-heading font-display">
           Current State: 
           {% if secure_mode %}
             <span class="text-success">Hardened Defense Profile</span>
@@ -31,66 +51,80 @@
             <span class="text-danger">Exposed Demonstration Profile</span>
           {% endif %}
         </h2>
-        <p class="card-desc text-sm text-muted">
+
+        <p class="breaker-desc text-muted text-sm font-sans">
           {% if secure_mode %}
-            All 8 OWASP Top 10 safeguards are actively enforced: strict IDOR authorization, parameterized queries, AES-256-GCM envelope encryption, and safe error handling.
+            All 8 OWASP Top 10 safeguards are actively enforced: strict IDOR authorization, parameterized SQL queries, AES-256-GCM envelope encryption, and safe error suppression.
           {% else %}
-            Defenses are intentionally deactivated to showcase vulnerability mechanics for evaluation: IDOR ownership bypass is exposed, raw SQL formatting enabled, and tracebacks unsuppressed.
+            Defenses are intentionally deactivated to showcase vulnerability mechanics for viva evaluation: IDOR ownership bypass is exposed, raw SQL formatting enabled, and tracebacks unsuppressed.
           {% endif %}
         </p>
+
+        <div class="flex-row gap-xs items-center font-mono text-xs text-dim">
+          <span>TARGET_ENVIRONMENT: FLASK_RUNTIME_CONFIG</span>
+          <span>·</span>
+          <span>PERSISTENCE: SESSION_BOUND</span>
+        </div>
       </div>
 
-      <div>
+      <div class="breaker-switch-assembly">
         <form action="/admin/secure-mode/toggle" method="POST">
-          <button type="submit" class="btn {{ 'btn-danger' if secure_mode else 'btn-primary' }} btn-lg">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
-              <line x1="12" y1="2" x2="12" y2="12"/>
-            </svg>
-            Toggle SECURE_MODE ({{ 'Deactivate Defenses' if secure_mode else 'Activate Defenses' }})
+          <button type="submit" class="btn {{ 'btn-danger' if secure_mode else 'btn-primary' }} btn-lg btn-circuit-breaker font-mono">
+            <span class="breaker-lever-indicator" aria-hidden="true"></span>
+            <span class="breaker-label">
+              Toggle SECURE_MODE ({{ 'Deactivate Defenses' if secure_mode else 'Activate Defenses' }})
+            </span>
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Comparative OWASP Top 10 Breakdown Table -->
-  <div class="table-container card-glass">
-    <table class="table-vault">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Vulnerable Behavior (SECURE_MODE = False)</th>
-          <th>Active Defense Countermeasure (SECURE_MODE = True)</th>
-          <th>Target Component</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in defenses %}
-          <tr>
-            <td>
-              <div class="flex-col">
-                <span class="badge-status badge-info mb-xs">{{ item.id }}</span>
-                <strong>{{ item.category.split('–')[1] if '–' in item.category else item.category }}</strong>
-              </div>
-            </td>
-            <td>
-              <div class="alert alert-danger py-xs">
-                <span class="text-xs">{{ item.vulnerable }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="alert alert-success py-xs">
-                <span class="text-xs">{{ item.protected }}</span>
-              </div>
-            </td>
-            <td>
-              <code class="hash-badge">{{ item.target_endpoint }}</code>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- 8 Comparative Matrix Cards Section (A01 through A08) -->
+  <div class="soc-section-bar">
+    <div class="flex-row items-center gap-xs">
+      <h3 class="font-display">OWASP Top 10 Comparative Defense Matrix</h3>
+    </div>
+    <span class="font-mono text-xs text-dim">[8 VECTORS MONITORED]</span>
+  </div>
+
+  <div class="owasp-matrix-grid mb-xl">
+    {% for item in defenses %}
+      <div class="owasp-card card-glass" id="card-{{ item.id }}">
+        <div class="owasp-card-header">
+          <div class="flex-col gap-2xs">
+            <div class="flex-row items-center gap-xs">
+              <span class="badge-status badge-info owasp-id-badge font-mono">{{ item.id }}</span>
+              <span class="badge-status badge-role font-mono text-xs">VIVA_DEMO</span>
+            </div>
+            <h4 class="owasp-title font-display mt-xs">{{ item.category }}</h4>
+          </div>
+          <code class="hash-badge owasp-target-chip font-mono" title="Target Component / Endpoint">
+            {{ item.target_endpoint }}
+          </code>
+        </div>
+
+        <div class="flex-col gap-sm">
+          <!-- Vulnerable Trace Box -->
+          <div class="trace-box vuln-trace-box">
+            <div class="trace-header">
+              <span class="trace-dot dot-crimson"></span>
+              <span class="trace-label font-mono text-danger">[VULNERABLE PATH · SECURE_MODE = OFF]</span>
+            </div>
+            <div class="trace-body text-xs font-mono">{{ item.vulnerable }}</div>
+          </div>
+
+          <!-- Hardened Defense Trace Box -->
+          <div class="trace-box defense-trace-box">
+            <div class="trace-header">
+              <span class="trace-dot dot-emerald"></span>
+              <span class="trace-label font-mono text-success">[HARDENED DEFENSE · SECURE_MODE = ON]</span>
+            </div>
+            <div class="trace-body text-xs font-mono">{{ item.protected }}</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
