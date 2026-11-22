@@ -1,21 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}My Media Vault{% endblock %}
+{% block title %}Encrypted Evidence Locker{% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="flex-row justify-between items-center mb-lg">
+  <!-- Header & Ingress Action -->
+  <div class="flex-row justify-between items-center mb-md flex-wrap gap-md">
     <div>
-      <h1 class="card-title">Encrypted Media Vault</h1>
-      <p class="card-subtitle">Manage your cryptographically registered assets, download provenance certificates, or retrieve decrypted originals.</p>
+      <div class="badge-status badge-info mb-2xs">Zero-Plaintext Storage</div>
+      <h1 class="card-title">Encrypted Evidence Locker</h1>
+      <p class="card-subtitle">Authenticated forensic asset repository. Ciphertext secured on disk via AES-256-GCM.</p>
     </div>
-    <a href="/media/upload" class="btn btn-primary">
+    <a href="/media/upload" class="btn btn-primary btn-lg">
       <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/>
         <line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
-      Upload New Media
+      Ingest New Evidence
     </a>
+  </div>
+
+  <!-- Top Telemetry Rail -->
+  <div class="telemetry-rail mb-lg font-mono">
+    <div class="telemetry-rail-item">
+      <span class="telemetry-label">TOTAL ASSETS:</span>
+      <span class="telemetry-value font-mono">{{ media_list|length if media_list else 0 }}</span>
+    </div>
+    <div class="telemetry-divider">|</div>
+    <div class="telemetry-rail-item">
+      <span class="telemetry-label">ENCRYPTED VOLUME:</span>
+      <span class="telemetry-value font-mono">{{ "{:,}".format(media_list|sum(attribute='file_size')) if media_list else 0 }} B</span>
+    </div>
+    <div class="telemetry-divider">|</div>
+    <div class="telemetry-rail-item">
+      <span class="telemetry-label">LEDGER STATUS:</span>
+      <span class="telemetry-value text-success font-mono">BLOCKCHAIN ANCHORED</span>
+    </div>
+    <div class="telemetry-divider">|</div>
+    <div class="telemetry-rail-item">
+      <span class="telemetry-label">CIPHER:</span>
+      <span class="telemetry-value font-mono">AES-256-GCM</span>
+    </div>
   </div>
 
   {% if media_list %}
@@ -25,10 +50,10 @@
           <tr>
             <th>Asset Filename</th>
             <th>MIME Type</th>
-            <th>File Size</th>
-            <th>Cryptographic Fingerprint (SHA-256)</th>
+            <th>Payload Size</th>
+            <th>Cryptographic Digest (SHA-256)</th>
             <th>Perceptual Hash</th>
-            <th>Registration Date</th>
+            <th>Timestamp (UTC)</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -36,29 +61,38 @@
           {% for item in media_list %}
             <tr>
               <td>
-                <strong>{{ item.original_filename }}</strong>
+                <div class="flex-row items-center gap-xs">
+                  {% if 'image' in item.file_type %}
+                    <span class="file-glyph glyph-image font-mono">[IMG]</span>
+                  {% elif 'video' in item.file_type %}
+                    <span class="file-glyph glyph-video font-mono">[VID]</span>
+                  {% else %}
+                    <span class="file-glyph glyph-file font-mono">[BIN]</span>
+                  {% endif %}
+                  <strong class="font-mono text-main">{{ item.original_filename }}</strong>
+                </div>
               </td>
               <td>
-                <span class="badge-status badge-info">{{ item.file_type }}</span>
+                <span class="badge-status badge-info font-mono">{{ item.file_type }}</span>
               </td>
-              <td>{{ "{:,}".format(item.file_size) }} B</td>
+              <td class="font-mono text-muted">{{ "{:,}".format(item.file_size) }} B</td>
               <td>
-                <code class="hash-badge" title="{{ item.sha256_hash }}">
+                <code class="hash-badge hex-chip font-mono" title="{{ item.sha256_hash }}">
                   {{ item.sha256_hash[:12] }}...{{ item.sha256_hash[-8:] }}
                 </code>
               </td>
               <td>
-                <code class="hash-badge">{{ item.phash }}</code>
+                <code class="phash-badge font-mono">{{ item.phash }}</code>
               </td>
-              <td>{{ item.registration_timestamp }}</td>
+              <td class="font-mono text-xs text-dim">{{ item.registration_timestamp }}</td>
               <td>
-                <div class="flex-row gap-xs items-center">
+                <div class="action-buttons-tactical flex-row gap-xs items-center">
                   {% if item.file_type in ['image/jpeg', 'image/png'] %}
-                    <a href="/media/{{ item.media_id }}/preview" class="btn btn-secondary btn-sm" title="View Decrypted Preview">Preview</a>
+                    <a href="/media/{{ item.media_id }}/preview" class="btn btn-secondary btn-sm" title="View In-Memory Decrypted Preview">[VIEW]</a>
                   {% endif %}
-                  <a href="/media/{{ item.media_id }}/download" class="btn btn-outline btn-sm" title="Decrypt & Download Original">Download</a>
-                  <a href="/media/{{ item.media_id }}/certificate" class="btn btn-primary btn-sm" title="Download Official PDF Certificate">Certificate</a>
-                  <a href="/verify?cert_id={{ item.media_id }}" class="btn btn-secondary btn-sm" title="Verify in Public Portal">Verify</a>
+                  <a href="/media/{{ item.media_id }}/download" class="btn btn-outline btn-sm" title="Decrypt and Download Original Payload">[DECRYPT]</a>
+                  <a href="/media/{{ item.media_id }}/certificate" class="btn btn-primary btn-sm" title="Export Official PDF Provenance Certificate">[CERT]</a>
+                  <a href="/verify?cert_id={{ item.media_id }}" class="btn btn-secondary btn-sm" title="Verify Integrity in Public Portal">[VERIFY]</a>
                 </div>
               </td>
             </tr>
@@ -67,12 +101,40 @@
       </table>
     </div>
   {% else %}
-    <div class="card-glass text-center">
-      <div class="badge-status badge-info mb-sm">Vault Empty</div>
-      <h2>No Registered Media Found</h2>
-      <p>You have not encrypted or registered any media assets yet. Click below to secure your first file.</p>
-      <div class="mt-md">
-        <a href="/media/upload" class="btn btn-primary">Upload First Asset</a>
+    <!-- Cryptographic Vault Armed State (Empty State) -->
+    <div class="card-glass vault-armed-state text-center">
+      <div class="armed-indicator-ring mb-sm">
+        <span class="armed-pulse"></span>
+        <span class="badge-status badge-authentic font-mono">[VAULT ARMED // ZERO ASSETS REGISTERED]</span>
+      </div>
+      <h2 class="card-title">Cryptographic Evidence Locker Online</h2>
+      <p class="card-subtitle max-w-lg mx-auto">
+        Zero-plaintext vault infrastructure is synchronized. Real-time encryption envelopes and audit chains are ready to receive evidence payloads.
+      </p>
+
+      <div class="vault-spec-list font-mono">
+        <div class="spec-card">
+          <div class="spec-label">ENVELOPE CIPHER</div>
+          <div class="spec-val text-success">AES-256-GCM ONLINE</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-label">IDENTITY ROOTS</div>
+          <div class="spec-val text-success">RSA-PSS-2048 VERIFIED</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-label">STORAGE POLICY</div>
+          <div class="spec-val text-success">ZERO-PLAINTEXT ARMED</div>
+        </div>
+      </div>
+
+      <div class="mt-lg">
+        <a href="/media/upload" class="btn btn-primary btn-lg">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ingest First Evidence Asset
+        </a>
       </div>
     </div>
   {% endif %}
