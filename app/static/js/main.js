@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initDropzones();
   initCopyButtons();
   initTotpInputs();
+  initAuditChainVerify();
+  initAttackSimulations();
 });
 
 /**
@@ -426,6 +428,199 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+/**
+ * Initializes 1-click blockchain hash-chain integrity sweep via AJAX.
+ */
+function initAuditChainVerify() {
+  const verifyForm = document.getElementById('verify-chain-form');
+  const verifyBtn = document.getElementById('btn-verify-chain');
+  const statusBanner = document.getElementById('chain-status-banner');
+
+  if (verifyForm && verifyBtn && statusBanner) {
+    if (verifyForm._auditChainInitialized) return;
+    verifyForm._auditChainInitialized = true;
+
+    verifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      verifyBtn.disabled = true;
+      const originalText = verifyBtn.innerHTML;
+      verifyBtn.innerHTML = `
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="2" x2="12" y2="6"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+          <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+          <line x1="2" y1="12" x2="6" y2="12"/>
+          <line x1="18" y1="12" x2="22" y2="12"/>
+        </svg>
+        <span>SWEEPING CHAIN...</span>
+      `;
+
+      statusBanner.innerHTML = `
+        <div class="sweep-hud-container font-mono">
+          <div class="sweep-scan-banner">
+            <div class="flex-row justify-between items-center text-xs">
+              <span class="text-primary font-bold">[INTEGRITY_SWEEP_ACTIVE]</span>
+              <span class="text-dim">RECOMPUTING MERKLE RECURSIVE HASHES...</span>
+            </div>
+            <div class="sweep-progress-track">
+              <div class="sweep-progress-bar"></div>
+            </div>
+            <div class="text-dim text-xs">
+              SWEEPING LEDGER BLOCKS [0x00 ... HEAD] // VERIFYING LINKAGE INTEGRITY
+            </div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch('/audit/verify-chain', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        const data = await res.json();
+
+        if (data.valid) {
+          statusBanner.innerHTML = `
+            <div class="alert alert-success">
+              <div class="alert-content">
+                <span class="badge-status badge-authentic font-mono">[CHAIN_VERIFIED_INTACT]</span>
+                <span class="font-mono text-sm">${data.message}</span>
+                <span class="text-dim font-mono text-xs ml-auto">0xMG SHA-256 HASH-CHAIN INTEGRITY: 100% VALID</span>
+              </div>
+            </div>
+          `;
+        } else {
+          statusBanner.innerHTML = `
+            <div class="alert alert-danger pulse-danger">
+              <div class="alert-content">
+                <span class="badge-status badge-modified font-mono">[CHAIN_INTEGRITY_BREACH]</span>
+                <span class="font-mono text-sm">${data.message}</span>
+                <span class="text-danger font-mono text-xs ml-auto font-bold">FAULT DETECTED AT BLOCK ID: #${data.corrupted_log_id}</span>
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        statusBanner.innerHTML = `
+          <div class="alert alert-danger">
+            <div class="alert-content">
+              <span class="badge-status badge-modified font-mono">[ERROR]</span>
+              <span class="font-mono text-sm">Failed to execute hash-chain integrity sweep request.</span>
+            </div>
+          </div>
+        `;
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = originalText;
+      }
+    });
+  }
+}
+
+/**
+ * Initializes adversarial attack simulation suite and real-time oscilloscope console.
+ */
+function initAttackSimulations() {
+  const runButtons = document.querySelectorAll('.btn-run-attack');
+  const emptyBox = document.getElementById('simulation-output-empty');
+  const activeBox = document.getElementById('simulation-output-active');
+  const consolePill = document.getElementById('console-status-pill');
+  const titleEl = document.getElementById('result-title');
+  const owaspEl = document.getElementById('result-owasp');
+  const statusContainer = document.getElementById('result-status-container');
+  const defenseEl = document.getElementById('result-defense');
+  const logEl = document.getElementById('result-log');
+  const terminalCard = document.getElementById('terminal-card');
+  const clockEl = document.getElementById('telemetry-clock');
+
+  if (!runButtons.length && !clockEl) return;
+
+  // Real-time oscilloscope UTC microsecond clock
+  function updateClock() {
+    if (!clockEl) return;
+    const now = new Date();
+    const h = String(now.getUTCHours()).padStart(2, '0');
+    const m = String(now.getUTCMinutes()).padStart(2, '0');
+    const s = String(now.getUTCSeconds()).padStart(2, '0');
+    const ms = String(now.getUTCMilliseconds()).padStart(3, '0');
+    clockEl.textContent = `UTC ${h}:${m}:${s}.${ms}000`;
+  }
+  if (clockEl && !window._clockIntervalSet) {
+    window._clockIntervalSet = true;
+    setInterval(updateClock, 100);
+    updateClock();
+  }
+
+  runButtons.forEach(btn => {
+    if (btn._attackBtnInitialized) return;
+    btn._attackBtnInitialized = true;
+
+    btn.addEventListener('click', async () => {
+      const attackId = btn.getAttribute('data-attack-id');
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>[DISPATCHING VECTOR...]</span>';
+      if (consolePill) {
+        consolePill.textContent = '[EXECUTING TELEMETRY...]';
+        consolePill.className = 'badge-status badge-warning font-mono text-xs pulse-amber';
+      }
+
+      try {
+        const res = await fetch(`/experiments/run/${attackId}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (emptyBox) emptyBox.classList.add('hidden');
+          if (activeBox) activeBox.classList.remove('hidden');
+
+          if (titleEl) titleEl.textContent = data.title;
+          if (owaspEl) owaspEl.textContent = data.owasp;
+          if (defenseEl) defenseEl.textContent = data.cryptographic_defense;
+
+          const now = new Date();
+          const timestamp = `[${now.toISOString()}] [VECTOR: ${attackId.toUpperCase()}]\n`;
+          if (logEl) logEl.textContent = timestamp + data.diagnostic_log;
+
+          if (statusContainer) {
+            if (data.status === 'BLOCKED' || data.status === 'DETECTED') {
+              statusContainer.innerHTML = `<span class="badge-status badge-authentic font-mono text-sm">${data.status}: ATTACK MITIGATED</span>`;
+              if (consolePill) {
+                consolePill.textContent = `[${data.status} // DEFENSE VERIFIED]`;
+                consolePill.className = 'badge-status badge-authentic font-mono text-xs';
+              }
+            } else {
+              statusContainer.innerHTML = `<span class="badge-status badge-modified font-mono text-sm pulse-danger">${data.status}</span>`;
+              if (consolePill) {
+                consolePill.textContent = `[${data.status} // BREACH]`;
+                consolePill.className = 'badge-status badge-modified font-mono text-xs pulse-danger';
+              }
+            }
+          }
+
+          if (terminalCard) {
+            terminalCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } else {
+          alert('Failed to execute simulation: ' + (data.error || 'Server Error'));
+        }
+      } catch (err) {
+        alert('Network or server error executing simulation: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+  });
+}
+
 // Module and Global Exports for test harnesses & browser environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -435,6 +630,8 @@ if (typeof module !== 'undefined' && module.exports) {
     initDropzones,
     initCopyButtons,
     initTotpInputs,
+    initAuditChainVerify,
+    initAttackSimulations,
     formatBytes,
     copyTextToClipboard,
     applyCopiedFeedback
@@ -447,6 +644,8 @@ if (typeof module !== 'undefined' && module.exports) {
     initDropzones,
     initCopyButtons,
     initTotpInputs,
+    initAuditChainVerify,
+    initAttackSimulations,
     formatBytes,
     copyTextToClipboard,
     applyCopiedFeedback
