@@ -1,4 +1,7 @@
-# MediaGuard – Secure Media Authenticity & Integrity Verification System
+# Info Sec Project — MediaGuard
+
+> **About this Project (Non-Technical Summary):**  
+> **MediaGuard** is a media authenticity and verification system designed to protect digital photos and videos from being tampered with, edited, or faked. When you upload and register a file, the system creates a unique digital fingerprint and generates a tamper-proof verification certificate. Anyone can then submit a file to instantly check whether it is 100% original and untampered, or if it has been altered, modified, or re-saved.
 
 > **CS-353 Information Security (2+1) — Semester Project (CLO-3)**  
 > **National University of Sciences & Technology (NUST) · SEECS**  
