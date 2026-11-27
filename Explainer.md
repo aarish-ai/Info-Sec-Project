@@ -425,7 +425,7 @@ To understand how all these gears turn together, let's follow a complete, realis
 | - Alice: A crime scene forensic photographer (Legitimate Media Owner).                            |
 | - Bob: A court judge and prosecutor (Public Verifier).                                             |
 | - Charlie: A corrupt defense associate trying to alter evidence (Malicious Attacker).             |
-| - Hanya: The independent compliance auditor (Auditor).                                             |
+| - Haniyya: The independent compliance auditor (Auditor).                                             |
 +----------------------------------------------------------------------------------------------------+
 ```
 
@@ -492,11 +492,11 @@ To understand how all these gears turn together, let's follow a complete, realis
 
 ---
 
-### Scene 5: Auditor Hanya Audits the System
-1. Compliance Officer Hanya logs in with her **Auditor** account.
+### Scene 5: Auditor Haniyya Audits the System
+1. Compliance Officer Haniyya logs in with her **Auditor** account.
 2. She navigates to `/audit`.
 3. She reviews the immutable log of Alice's registration, Bob's successful verification, and Charlie's failed tampering attempt.
-4. Hanya clicks **"Verify Entire Audit Chain"**.
+4. Haniyya clicks **"Verify Entire Audit Chain"**.
 5. Python walks the cryptographic hash links from row 1 to row 500, confirming that no rogue system administrator modified any records or deleted Charlie's failed attempt.
 6. A green confirmation banner displays: *"All 500 Audit Log Entries Valid & Cryptographically Intact."*
 

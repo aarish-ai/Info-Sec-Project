@@ -151,7 +151,7 @@ def run_browser_e2e():
         auditor_page = auditor_context.new_page()
 
         auditor_page.goto(f"{BASE_URL}/auth/register", wait_until="networkidle")
-        auditor_user = f"auditor_hanya_{int(time.time())}"
+        auditor_user = f"auditor_haniyya_{int(time.time())}"
         auditor_page.fill("#username", auditor_user)
         auditor_page.fill("#email", f"{auditor_user}@nust.edu.pk")
         auditor_page.select_option("#role", "Auditor")

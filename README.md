@@ -6,7 +6,7 @@
 > **CS-353 Information Security (2+1) — Semester Project (CLO-3)**  
 > **National University of Sciences & Technology (NUST) · SEECS**  
 > **Instructor:** Ms. Hirra Anwar  
-> **Team Members:** Abdul Moiz (541687), Aarish Muhammad (542859), Hanya Zubair (550985)
+> **Team Members:** Abdul Moiz (541687), Aarish Muhammad (542859), Haniyya Zubair (550985)
 
 ---
 

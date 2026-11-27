@@ -26,7 +26,7 @@
      - Symmetric envelope encryption (AES-256-GCM per-file key generation, RSA-OAEP key wrapping).
      - Multi-Factor Authentication via TOTP (`pyotp`).
      - System-level `SECURE_MODE` toggle engine for live before-and-after vulnerability demonstrations.
-  3. **Hanya Zubair (CMS ID: 550985):**
+  3. **Haniyya Zubair (CMS ID: 550985):**
      - Streamed SHA-256 cryptographic hashing and perceptual hashing (pHash via `imagehash`).
      - Deterministic canonical Registration Manifest generation and RSA-PSS digital signing/verification.
      - Public Verification Portal (unauthenticated guest verification).
@@ -620,12 +620,12 @@ During evaluation by Ms. Hirra Anwar and course evaluators, the team can demonst
 1. **Architecture & Key Separation (Aarish Muhammad):**
    - Explain why dual RSA key pairs were chosen instead of reusing a single key (preventing cross-protocol attacks).
    - Demonstrate account creation, TOTP scan via Google Authenticator, and show that private keys on disk in `storage/key_storage/` are high-entropy AES ciphertext protected by scrypt.
-2. **Media Registration & Certificate Issuance (Hanya Zubair):**
+2. **Media Registration & Certificate Issuance (Haniyya Zubair):**
    - Upload an authentic photograph (`crime_scene.jpg`).
    - Show the generated canonical manifest, SHA-256 hash, and RSA-PSS signature.
    - Show that the stored file in `storage/encrypted_media/` is completely unreadable ciphertext.
    - Open and display the generated **PDF Verification Certificate** and scan its QR code to demonstrate seamless verification linking.
-3. **Public Verification & Tampering Detection (Hanya Zubair):**
+3. **Public Verification & Tampering Detection (Haniyya Zubair):**
    - Open an incognito browser window (unauthenticated guest).
    - Verify the original file: Receive **Green "AUTHENTIC"** verdict.
    - Upload a tampered version of the file (1 pixel modified): Receive **Red "MODIFIED"** verdict. Explain how SHA-256 caught the byte difference while pHash diagnosed the perceptual similarity.
