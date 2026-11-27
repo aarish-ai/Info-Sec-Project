@@ -14,9 +14,14 @@
 **MediaGuard** is an institutional-grade, zero-trust digital media provenance and verification web application designed to protect images and videos against tampering, deepfakes, and unauthorized modification.
 
 ### Core Cryptographic Capabilities:
-- **Key Separation Principle:** Dual independent RSA-2048 key pairs per user (one for **RSA-PSS** digital signatures, one for **RSA-OAEP** symmetric key wrapping).
-- **Zero-Plaintext Envelope Encryption:** Media files are encrypted with unique, random **AES-256-GCM** symmetric keys at rest. Unencrypted temporary files are deleted immediately after encryption.
-- **Private Key Protection at Rest:** User private keys are protected on disk using **scrypt**-derived keys ($N=16384, r=8, p=1$) and **AES-256-GCM** encryption under [`storage/key_storage/`](storage/key_storage/).
+- **Custom Pure-Python Cryptographic Engines (`app/core/custom_crypto/`):**
+  - **Custom SHA-256 (FIPS 180-4):** Pure-Python 64-round streaming compression engine powering file integrity checks and the audit ledger.
+  - **Custom HMAC (RFC 2104) & TOTP (RFC 6238):** From-scratch keyed-hash MAC, Base32 decoder, and 6-digit TOTP authenticator verification.
+  - **Custom 2D-DCT Perceptual Hashing (pHash):** Pure-Python separable 2D Discrete Cosine Transform and Hamming distance engine.
+  - **Custom AES-256-CTR + HMAC-SHA256 (AEAD):** Pure-Python Rijndael block cipher (GF($2^8$) S-box, key expansion, MixColumns) in CTR mode with Encrypt-then-MAC authentication.
+- **Standard Library Primitives (High-Complexity Boundaries):**
+  - **Key Separation Principle:** Dual independent RSA-2048 key pairs per user (`cryptography` for 1024-bit prime generation, RSA-PSS signatures, and RSA-OAEP key wrapping).
+  - **Password & Key Protection at Rest:** **Argon2id** (`argon2-cffi`) for login passwords and **scrypt** ($N=16384, r=8, p=1$) + **AES-256-GCM** for private key encryption under [`storage/key_storage/`](storage/key_storage/).
 - **Dual-Check Public Verification:** Universal public portal (`/verify`) open to unauthenticated guests, verifying both byte-for-byte fidelity (**SHA-256**) and provenance authenticity (**RSA-PSS**), accompanied by perceptual diagnostics (**pHash** Hamming distance).
 - **Digitally Signed PDF Certificates:** Generated dynamically with embedded **QR codes** linking straight to the public verification portal.
 - **Tamper-Evident Audit Trail:** Blockchain-style hash-chained log (`audit_log`) with a 1-click cryptographic integrity verification tool for the Auditor role.
