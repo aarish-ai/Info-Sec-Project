@@ -2,7 +2,7 @@ import io
 import os
 import uuid
 import base64
-import hashlib
+from app.core.custom_crypto.sha256 import CustomSHA256
 from datetime import datetime, timezone
 from pathlib import Path
 from flask import (
@@ -220,7 +220,7 @@ def upload():
         cursor.execute("SELECT current_hash FROM audit_log ORDER BY log_id DESC LIMIT 1")
         last_log = cursor.fetchone()
         prev_h = last_log['current_hash'] if last_log else "0" * 64
-        curr_h = hashlib.sha256(f"{prev_h}:{user_id}:MEDIA_UPLOAD:{media_id}".encode('utf-8')).hexdigest()
+        curr_h = CustomSHA256(f"{prev_h}:{user_id}:MEDIA_UPLOAD:{media_id}".encode('utf-8')).hexdigest()
         cursor.execute(
             """
             INSERT INTO audit_log (user_id, action, details, ip_address, prev_hash, current_hash)
@@ -356,7 +356,7 @@ def download_media(media_id: str):
         return redirect(url_for('media.media_library'))
 
     # Verify Plaintext SHA-256 matches registered hash
-    computed_sha256 = hashlib.sha256(decrypted_bytes).hexdigest().lower()
+    computed_sha256 = CustomSHA256(decrypted_bytes).hexdigest().lower()
     if computed_sha256 != record['sha256_hash'].lower():
         if _wants_json():
             return jsonify({'error': 'Integrity failure: decrypted hash mismatch'}), 500

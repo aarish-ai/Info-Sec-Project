@@ -2,7 +2,10 @@ import os
 from typing import Dict, Union
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from app.core.custom_crypto.aes import (
+    aes_256_ctr_hmac_decrypt,
+    aes_256_ctr_hmac_encrypt,
+)
 
 def encrypt_media_envelope(
     file_bytes: bytes,
@@ -25,11 +28,8 @@ def encrypt_media_envelope(
     aes_key = os.urandom(32)
     nonce = os.urandom(12)
 
-    # 2. AES-256-GCM symmetric encryption
-    aesgcm = AESGCM(aes_key)
-    combined = aesgcm.encrypt(nonce, file_bytes, associated_data=None)
-    ciphertext = combined[:-16]
-    auth_tag = combined[-16:]
+    # 2. Custom pure-Python AES-256-CTR + HMAC-SHA256 authenticated encryption
+    ciphertext, auth_tag = aes_256_ctr_hmac_encrypt(aes_key, nonce, file_bytes)
 
     # 3. Asymmetric key wrapping using RSA-OAEP (SHA-256 + MGF1)
     public_key = serialization.load_pem_public_key(pub_pem_bytes)
@@ -79,7 +79,5 @@ def decrypt_media_envelope(
         )
     )
 
-    # 2. Decrypt AES-256-GCM and authenticate tag
-    aesgcm = AESGCM(aes_key)
-    combined = ciphertext + auth_tag
-    return aesgcm.decrypt(nonce, combined, associated_data=None)
+    # 2. Verify HMAC-SHA256 tag and decrypt with custom AES-256-CTR
+    return aes_256_ctr_hmac_decrypt(aes_key, nonce, ciphertext, auth_tag)
