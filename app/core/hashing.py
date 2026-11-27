@@ -2,8 +2,8 @@ import io
 from pathlib import Path
 from typing import Union
 from PIL import Image
-import imagehash
 from app.core.custom_crypto.sha256 import CustomSHA256
+from app.core.custom_crypto.phash import custom_dct_phash, custom_hamming_distance
 
 DEFAULT_CHUNK_SIZE = 64 * 1024  # 64 KB
 
@@ -63,8 +63,7 @@ def compute_phash(
     try:
         # Open and load image to verify decodability
         with Image.open(file_path_or_stream) as img:
-            phash_obj = imagehash.phash(img)
-            return str(phash_obj).lower()
+            return custom_dct_phash(img)
     except Exception:
         return "N/A"
     finally:
@@ -81,19 +80,4 @@ def compute_phash_distance(hash1_hex: str, hash2_hex: str) -> int:
     A distance of 0 means identical visual perception.
     Distance <= 10 typically indicates perceptual similarity.
     """
-    if not hash1_hex or not hash2_hex:
-        return -1
-    
-    clean1 = hash1_hex.strip().lower()
-    clean2 = hash2_hex.strip().lower()
-
-    if clean1 == 'n/a' or clean2 == 'n/a':
-        return -1
-
-    try:
-        val1 = int(clean1, 16)
-        val2 = int(clean2, 16)
-        # Compute Hamming distance via XOR and bit count
-        return bin(val1 ^ val2).count('1')
-    except (ValueError, TypeError):
-        return -1
+    return custom_hamming_distance(hash1_hex, hash2_hex)
