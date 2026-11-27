@@ -88,7 +88,7 @@ class CustomTOTP:
         return matched
 
     def provisioning_uri(self, name: str, issuer_name: str = "MediaGuard") -> str:
-        label = urllib.parse.quote(f"{issuer_name}:{name}")
+        label = urllib.parse.quote(f"{issuer_name}:{name}", safe=":@")
         params = urllib.parse.urlencode({
             "secret": self.secret,
             "issuer": issuer_name,

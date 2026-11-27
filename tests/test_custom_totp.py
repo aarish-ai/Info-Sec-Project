@@ -32,5 +32,14 @@ def test_custom_totp_generation_and_verification():
     wrong_code = "000000" if code != "000000" else "111111"
     assert totp.verify(wrong_code, valid_window=0) is False
     uri = totp.provisioning_uri(name="alice", issuer_name="MediaGuard")
-    assert uri.startswith("otpauth://totp/")
+    assert uri.startswith("otpauth://totp/MediaGuard:alice?")
     assert f"secret={secret}" in uri
+
+
+def test_custom_totp_rfc6238_fixed_timestamp_vector():
+    """RFC 6238 Appendix B SHA-1 8-digit / 6-digit test vector at t=59 (counter=1)."""
+    # Secret "12345678901234567890" in Base32 is "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"
+    totp = CustomTOTP("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", interval=30, digits=6)
+    # RFC 6238 8-digit value at t=59 is 94287082 -> 6-digit is 287082
+    assert totp.at(59) == "287082"
+    assert totp.verify("287082", valid_window=0, for_time=59) is True
