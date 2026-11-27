@@ -1,9 +1,9 @@
 import io
-import hashlib
 from pathlib import Path
 from typing import Union
 from PIL import Image
 import imagehash
+from app.core.custom_crypto.sha256 import CustomSHA256
 
 DEFAULT_CHUNK_SIZE = 64 * 1024  # 64 KB
 
@@ -16,7 +16,7 @@ def compute_streamed_sha256(
     Accepts a filesystem path (str or Path) or a binary readable stream.
     If a seekable stream is provided, its original position is restored.
     """
-    hasher = hashlib.sha256()
+    hasher = CustomSHA256()
 
     if isinstance(file_path_or_stream, (str, Path)):
         with open(file_path_or_stream, 'rb') as f:

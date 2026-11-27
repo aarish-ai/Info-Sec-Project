@@ -1,5 +1,5 @@
-import hashlib
 from typing import Optional, Tuple
+from app.core.custom_crypto.sha256 import CustomSHA256
 from app.database.db import get_db
 
 GENESIS_HASH = "0" * 64
@@ -26,7 +26,7 @@ def compute_log_hash(
         f"{str(ip_address or '')}|"
         f"{str(prev_hash or '')}"
     )
-    return hashlib.sha256(canonical_string.encode('utf-8')).hexdigest()
+    return CustomSHA256(canonical_string.encode('utf-8')).hexdigest()
 
 def append_audit_log(
     db=None,
